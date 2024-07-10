@@ -86,6 +86,8 @@ export interface GameState {
   board: GameBoard
   history: GameBoard[]
   currentTurn: number
+  selectedCardId: string | null
+  destinationStackId: string | null
 }
 
 // Function types for game actions

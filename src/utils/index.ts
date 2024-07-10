@@ -2,16 +2,18 @@
 
 import { Card, CardDeck, CardSlot, CardSlotType, CardStack, GameBoard, Rank, Suit } from '@/types'
 
+import { v4 as uuidv4 } from 'uuid';
+
 export class CardGameLibrary {
   private static generateDeck(id: number): CardDeck {
-    const deck: CardDeck = { id: `deck-${id}-${Math.random()}`, cards: [], className: 'red' }
+    const deck: CardDeck = { id: `deck-${id}-${uuidv4()}`, cards: [], className: 'red' }
     const suits = Object.values(Suit)
     const ranks = Object.values(Rank)
 
     for (const suit of suits) {
       for (const rank of ranks) {
         deck.cards.push({
-          id: `${rank}-${suit}-${Math.random()}`,
+          id: `${rank}-${suit}-${uuidv4()}`,
           suit,
           rank,
           faceUp: true,
@@ -40,14 +42,14 @@ export class CardGameLibrary {
 
   public static createCardStack(cards: Card[]): CardStack {
     return {
-      id: `stack-${Date.now()}-${Math.random()}`,
+      id: `stack-${uuidv4()}`,
       cards
     }
   }
 
   public static createCardSlot(type: CardSlotType, stack: CardStack): CardSlot {
     return {
-      id: `slot-${Date.now()}-${Math.random()}`,
+      id: `slot-${uuidv4()}`,
       type,
       stacks: [stack]
     }
@@ -82,7 +84,7 @@ export class CardGameLibrary {
     this.dealCardsToSlots(decks[0].cards, slots, cardsPerSlot)
 
     return {
-      id: `board-${Date.now()}-${Math.random()}`,
+      id: `board-${uuidv4()}`,
       slots
     }
   }

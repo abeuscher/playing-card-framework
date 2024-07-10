@@ -2,17 +2,17 @@
 
 import { CardClassMap, Card as CardType } from '@/types'
 
+import { dragCard } from '@/store/gameSlice'
 import styles from './Card.module.scss'
 import { useDrag } from 'react-dnd'
 
 interface CardProps {
   card: CardType
-  onClick: () => void
-  onDrop: (event: React.DragEvent) => void
+  onCardDrag: () => void
   draggable?: boolean
 }
 
-const Card: React.FC<CardProps> = ({ card, onClick, onDrop, draggable }) => {
+const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
   const [{ isDragging }, dragRef] = useDrag(
     () => ({
       type: 'CARD',
@@ -20,7 +20,10 @@ const Card: React.FC<CardProps> = ({ card, onClick, onDrop, draggable }) => {
       canDrag: draggable,
       collect: (monitor) => ({
         isDragging: monitor.isDragging()
-      })
+      }),
+      end: (item, monitor) => {
+        onCardDrag({ cardId: card.id })
+      }
     }),
     [draggable]
   )
@@ -32,7 +35,7 @@ const Card: React.FC<CardProps> = ({ card, onClick, onDrop, draggable }) => {
     return `${styles.card} ${suitClass} ${rankClass} ${faceClass}`
   }
   const CardComponent = () => (
-    <div className={getCardClass(card)} onClick={onClick} onDrop={onDrop}>
+    <div className={getCardClass(card)}>
       <span></span>
     </div>
   )

@@ -7,16 +7,16 @@ import { useDrop } from 'react-dnd'
 
 interface CardStackProps {
   stack: CardStackType
-  onCardClick: (cardId: string) => void
-  onCardDrop: (cardId: string, stackId: string) => void
+  onCardDrag: (cardId: string) => void
+  onCardDrop: (stackId: string) => void
 }
 
-const CardStack: React.FC<CardStackProps> = ({ stack, onCardClick, onCardDrop }) => {
+const CardStack: React.FC<CardStackProps> = ({ stack, onCardDrag, onCardDrop }) => {
   const [{ isOver, canDrop }, dropRef] = useDrop(
     () => ({
       accept: 'CARD',
-      drop: (item: { id: string }) => {
-        onCardDrop(item.id, stack.id)
+      drop: () => {
+        onCardDrop(stack.id)
       },
       collect: (monitor) => ({
         isOver: monitor.isOver(),
@@ -29,13 +29,7 @@ const CardStack: React.FC<CardStackProps> = ({ stack, onCardClick, onCardDrop })
   return dropRef(
     <div className={`${styles.cardStack} ${isOver && canDrop ? styles.highlight : ''}`}>
       {stack.cards.map((card) => (
-        <Card
-          key={card.id}
-          card={card}
-          onClick={() => onCardClick(card.id)}
-          draggable={true}
-          onDrop={() => {}}
-        />
+        <Card key={card.id} card={card} onCardDrag={onCardDrag} draggable={true} />
       ))}
     </div>
   )

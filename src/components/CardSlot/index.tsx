@@ -6,15 +6,15 @@ import styles from './CardSlot.module.scss'
 
 interface CardSlotProps {
   stacks: CardStackType[]
-  onCardClick: (cardId: string) => void
-  onCardDrop: (cardId: string, stackId: string) => void
+  onCardDrag: (cardId: string) => void
+  onCardDrop: (destinationId: string) => void
 }
 
-const CardSlot: React.FC<CardSlotProps> = ({ stacks, onCardClick, onCardDrop }) => {
+const CardSlot: React.FC<CardSlotProps> = ({ stacks, onCardDrag, onCardDrop }) => {
   return (
     <div className={styles.cardSlot}>
       {stacks.map((stack) => (
-        <CardStack key={stack.id} stack={stack} onCardClick={onCardClick} onCardDrop={onCardDrop} />
+        <CardStack key={stack.id} stack={stack} onCardDrag={onCardDrag} onCardDrop={onCardDrop} />
       ))}
     </div>
   )

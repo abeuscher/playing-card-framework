@@ -18,7 +18,8 @@
     "react-dom": "^18",
     "react-redux": "^9.1.2",
     "sass": "^1.77.7",
-    "scss": "^0.2.4"
+    "scss": "^0.2.4",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
