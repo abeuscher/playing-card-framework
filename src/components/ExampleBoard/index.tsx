@@ -2,21 +2,21 @@
 
 // Example usage in a parent component
 
+import { CardStack as CardStackType, Rank, Suit } from '@/types'
 import React, { useState } from 'react'
 
 import CardStack from '@/components/CardStack'
-import { CardStack as CardStackType } from '@/types'
 
 const initialStack: CardStackType = {
   id: 'stack-1',
   cards: [
-    { id: '1', suit: 'Hearts', rank: '6', faceUp: true },
-    { id: '2', suit: 'Diamonds', rank: 'King', faceUp: false }
+    { id: '1', suit: Suit['Hearts'], rank: Rank['Six'], faceUp: true },
+    { id: '2', suit: Suit['Diamonds'], rank: Rank['King'], faceUp: false }
   ]
 }
 const secondInitialStack: CardStackType = {
   id: 'stack-2',
-  cards: [{ id: '1', suit: 'Hearts', rank: '7', faceUp: true }]
+  cards: [{ id: '1', suit: Suit['Hearts'], rank: Rank['Six'], faceUp: true }]
 }
 
 const Example: React.FC = () => {
