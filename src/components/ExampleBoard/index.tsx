@@ -1,44 +1,39 @@
 'use client'
 
-// Example usage in a parent component
+import { CardSlotType, GameBoard as GameBoardType } from '@/types'
+import React, { useEffect, useState } from 'react'
 
-import { CardStack as CardStackType, Rank, Suit } from '@/types'
-import React, { useState } from 'react'
+import Card from '@/components/Card'
+import { CardGameLibrary } from '@/utils'
+import CardSlot from '@/components/CardSlot'
 
-import CardStack from '@/components/CardStack'
+const GameBoard = () => {
+  const [gameBoard, setGameBoard] = useState<null | GameBoardType>(null)
 
-const initialStack: CardStackType = {
-  id: 'stack-1',
-  cards: [
-    { id: '1', suit: Suit['Hearts'], rank: Rank['Six'], faceUp: true },
-    { id: '2', suit: Suit['Diamonds'], rank: Rank['King'], faceUp: false }
-  ]
-}
-const secondInitialStack: CardStackType = {
-  id: 'stack-2',
-  cards: [{ id: '1', suit: Suit['Hearts'], rank: Rank['Six'], faceUp: true }]
-}
+  useEffect(() => {
+    // Initialize the game board
+    const board = CardGameLibrary.initializeGameBoard(
+      [CardSlotType.Deck, CardSlotType.Foundation, CardSlotType.Tableau],
+      5,
+      1
+    )
+    setGameBoard(board)
+  }, [])
 
-const Example: React.FC = () => {
-  const [stack, setStack] = useState<CardStackType>(initialStack)
-  const [secondStack, setSecondStack] = useState<CardStackType>(secondInitialStack)
-
-  const handleCardClick = (cardId: string) => {
-    // Handle card click
-    console.log('Card clicked:', cardId)
-  }
-
-  const handleCardDrop = (cardId: string, stackId: string) => {
-    // Handle card drop
-    console.log('Card dropped:', cardId, 'into stack:', stackId)
+  if (!gameBoard) {
+    return <div>Loading...</div>
   }
 
   return (
-    <div className="app">
-      <CardStack stack={stack} onCardClick={handleCardClick} onCardDrop={handleCardDrop} />
-      <CardStack stack={secondStack} onCardClick={handleCardClick} onCardDrop={handleCardDrop} />
+    <div className="game-board">
+      {gameBoard.slots &&
+        gameBoard.slots.map((slot) => (
+          <div key={slot.id} className="card-slot">
+            <CardSlot stacks={slot.stacks} onCardClick={() => {}} onCardDrop={() => {}} />
+          </div>
+        ))}
     </div>
   )
 }
 
-export default Example
+export default GameBoard

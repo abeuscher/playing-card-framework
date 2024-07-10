@@ -48,7 +48,7 @@ export class CardGameLibrary {
     return {
       id: `slot-${Date.now()}-${Math.random()}`,
       type,
-      stack,
+      stacks: [stack],
     };
   }
 
@@ -57,7 +57,7 @@ export class CardGameLibrary {
     for (const slot of slots) {
       for (let i = 0; i < cardsPerSlot; i++) {
         if (deckIndex < deck.length) {
-          slot.stack.cards.push(deck[deckIndex]);
+          slot.stacks[0].cards.push(deck[deckIndex]);
           deckIndex++;
         }
       }

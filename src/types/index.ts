@@ -66,7 +66,7 @@ export enum CardSlotType {
 export interface CardSlot {
   id: string
   type: CardSlotType
-  stack: CardStack
+  stacks: CardStack[]
 }
 
 // Interface for the game board
