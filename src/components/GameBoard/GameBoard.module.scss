@@ -1,6 +1,40 @@
-.gameBoard {
+/* components/RussianBankGame.module.css */
+
+.container {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
+  margin-top: 2rem;
+}
+
+.playerArea {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  height: 100vh;
+}
+
+.cardArea {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.card {
+  background-size: cover;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.over {
+  border: 2px solid blue;
+}
+
+.humanCard {
+  border: 2px solid green;
+}
+
+.computerCard {
+  border: 2px solid red;
 }

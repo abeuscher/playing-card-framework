@@ -2,7 +2,6 @@
 
 import CardStack from '@/components/CardStack'
 import { CardStack as CardStackType } from '@/types'
-import React from 'react'
 import styles from './CardSlot.module.scss'
 
 interface CardSlotProps {

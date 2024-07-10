@@ -2,7 +2,6 @@
 
 import { CardClassMap, Card as CardType } from '@/types'
 
-import React from 'react'
 import styles from './Card.module.scss'
 import { useDrag } from 'react-dnd'
 
@@ -27,7 +26,6 @@ const Card: React.FC<CardProps> = ({ card, onClick, onDrop, draggable }) => {
   )
 
   const getCardClass = (card: CardType) => {
-    console.log('Card:', card)
     const suitClass = styles[`card-${card.suit.toLowerCase()}`]
     const rankClass = styles[CardClassMap[card.rank]]
     const faceClass = card.faceUp ? '' : styles['card-facedown']

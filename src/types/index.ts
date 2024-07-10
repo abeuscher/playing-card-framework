@@ -24,12 +24,18 @@ export enum Rank {
   King = 'King'
 }
 
-// Interface for a playing card
 export interface Card {
   id: string
   suit: Suit
   rank: Rank
   faceUp: boolean
+  deckId: string
+}
+
+export type CardDeck = {
+  id: string 
+  className: string
+  cards: Card[]
 }
 
 export const CardClassMap = {
