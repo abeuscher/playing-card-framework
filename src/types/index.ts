@@ -33,7 +33,7 @@ export interface Card {
 }
 
 export type CardDeck = {
-  id: string 
+  id: string
   className: string
   cards: Card[]
 }
@@ -54,10 +54,27 @@ export const CardClassMap = {
   King: 'card-k'
 }
 
+export interface CardStackLayout {
+  name: string // e.g. 'Tableau'
+  description: string // e.g. 'Tableau stack'
+  arrangement: 'stacked' | 'spread' | 'fan' 
+  direction: 'left' | 'right' | 'up' | 'down'
+  faceUp: boolean
+}
+
+export interface CardStackBehavior {
+  canDrag: boolean
+  canDrop: boolean
+  minimumCards: number
+  maximumCards: number
+}
+
 // Interface for a card stack
 export interface CardStack {
   id: string
   cards: Card[]
+  layout: CardStackLayout
+  behavior: CardStackBehavior
 }
 
 // Enum for different types of card slots on the game board

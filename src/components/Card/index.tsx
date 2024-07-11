@@ -2,37 +2,34 @@
 
 import { CardClassMap, Card as CardType } from '@/types'
 
-import { dragCard } from '@/store/gameSlice'
 import styles from './Card.module.scss'
 import { useDrag } from 'react-dnd'
 
 interface CardProps {
   card: CardType
-  onCardDrag: () => void
+  onCardDrag: (cardId: string) => void
   draggable?: boolean
 }
 
 const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
-  const [{ isDragging }, dragRef] = useDrag(
-    () => ({
-      type: 'CARD',
-      item: { id: card.id },
-      canDrag: draggable,
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging()
-      }),
-      end: (item, monitor) => {
-        onCardDrag({ cardId: card.id })
-      }
-    }),
-    [draggable]
-  )
+  const [{ isDragging }, dragRef] = useDrag(() => ({
+    type: 'CARD',
+    item: () => {
+      onCardDrag(card.id)
+      return { cardId: card.id }
+    },
+    canDrag: draggable,
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging()
+    })
+  }))
 
   const getCardClass = (card: CardType) => {
     const suitClass = styles[`card-${card.suit.toLowerCase()}`]
     const rankClass = styles[CardClassMap[card.rank]]
     const faceClass = card.faceUp ? '' : styles['card-facedown']
-    return `${styles.card} ${suitClass} ${rankClass} ${faceClass}`
+    const hoverClass = isDragging ? styles['card-hover'] : ''
+    return `${styles.card} ${suitClass} ${rankClass} ${faceClass} ${hoverClass}`
   }
   const CardComponent = () => (
     <div className={getCardClass(card)}>

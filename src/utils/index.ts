@@ -1,6 +1,6 @@
 // cardLibrary.ts
 
-import { Card, CardDeck, CardSlot, CardSlotType, CardStack, GameBoard, Rank, Suit } from '@/types'
+import { Card, CardDeck, CardSlot, CardSlotType, CardStack, CardStackBehavior, CardStackLayout, GameBoard, Rank, Suit } from '@/types'
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -23,8 +23,25 @@ export class CardGameLibrary {
     }
     return deck
   }
+  public static createDefaultCardStackLayout(): CardStackLayout {
+    return {
+      name: 'CardStack',
+      description: 'Default Card Stack',
+      arrangement: 'stacked',
+      direction: 'up',
+      faceUp: true
+    };
+  }
 
-  public static createDecks(numberOfDecks: number = 1): CardDecks[] {
+  public static createDefaultCardStackBehavior(): CardStackBehavior {
+    return {
+      canDrag: true,
+      canDrop: true,
+      minimumCards: 0,
+      maximumCards: Infinity
+    };
+  }
+  public static createDecks(numberOfDecks: number = 1): CardDeck[] {
     let decks: CardDeck[] = []
     for (let i = 0; i < numberOfDecks; i++) {
       decks.push(this.generateDeck(i))
@@ -43,7 +60,9 @@ export class CardGameLibrary {
   public static createCardStack(cards: Card[]): CardStack {
     return {
       id: `stack-${uuidv4()}`,
-      cards
+      cards,
+      layout: this.createDefaultCardStackLayout(),
+      behavior: this.createDefaultCardStackBehavior()
     }
   }
 
@@ -85,7 +104,7 @@ export class CardGameLibrary {
 
     return {
       id: `board-${uuidv4()}`,
-      slots
+      slots,
     }
   }
 }

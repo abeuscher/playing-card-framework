@@ -1,15 +1,15 @@
 /* styles/CardStack.module.scss */
 .cardStack {
-    position: relative;
-    width: 5em;
-    height: 7em;
-    margin: 0.3em;
-    background-color: #ccc;
-    border-radius: 0.3em;
-  }
-  
+  position: relative;
+  width: 5em;
+  height: 7em;
+  margin: 0.3em;
+  background-color: #ccc;
+  border-radius: 0.3em;
+  border: 5px solid transparent;
+}
+
 .highlight {
-    border-color: #0b0;
-    background-color: rgba(0, 255, 0, 0.1);
-  }
-  
+  border-color: #666;
+  background-color: rgba(0, 255, 0, 0.1);
+}

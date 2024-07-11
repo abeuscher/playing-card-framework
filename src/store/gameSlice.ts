@@ -1,6 +1,5 @@
-import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-
-import { GameState } from '@/types'
+import { GameBoard, GameState } from '@/types'
+import { PayloadAction, createSlice, current } from '@reduxjs/toolkit'
 
 const initialState: GameState = {
   board: {
@@ -22,32 +21,40 @@ const gameSlice = createSlice({
     },
     moveCard: (state, action: PayloadAction<{ destinationId: string }>) => {
       state.destinationStackId = action.payload.destinationId
-    },
-    dragCard: (state, action: PayloadAction<{ cardId: string }>): void => {
-      state.selectedCardId = action.payload.cardId
-      const cardStack = state.board.slots
+      console.log('moveCard', state.selectedCardId, state.destinationStackId)
+      if (!state.selectedCardId || !state.destinationStackId) {
+        return
+      }
+      const cardIndex = state.board.slots
         .map((slot) => slot.stacks)
         .flat()
-        .find((stack) => stack.cards.some((card) => card.id === action.payload.cardId))
-      if (cardStack) {
-        if (cardStack.cards.length === 0) {
-          return
-        }
-        cardStack.cards.slice(
-          cardStack.cards.findIndex((card) => card.id === action.payload.cardId),
-          1
-        )
-        const destinationStack = state.board.slots
+        .find((stack) => stack.cards.some((card) => card.id === state.selectedCardId))
+        ?.cards.findIndex((card) => card.id === state.selectedCardId)
+      if (cardIndex !== -1) {
+        const theCard = state.board.slots
           .map((slot) => slot.stacks)
           .flat()
-          .find((stack) => stack.id === state.destinationStackId)
-        if (destinationStack) {
-          destinationStack.cards.push(cardStack.cards[0])
+          .find((stack) => stack.cards.some((card) => card.id === state.selectedCardId))
+          ?.cards.pop()
+        if (theCard) {
+          state.board.slots
+            .map((slot) => slot.stacks)
+            .flat()
+            .find((stack) => stack.id === state.destinationStackId)
+            ?.cards.push(theCard)
         }
       }
+    },
+    dragCard: (state, action: PayloadAction<{ cardId: string }>): void => {
+      //console.log('dragCard', action.payload.cardId)
+      state.selectedCardId = action.payload.cardId
+    },
+    setGameBoard: (state, action: PayloadAction<{ board: GameBoard }>) => {
+      //console.log('setGameBoard', action.payload.board)
+      state.board = action.payload.board
     }
   }
 })
 
-export const { initializeGame, moveCard, dragCard } = gameSlice.actions
+export const { initializeGame, moveCard, dragCard, setGameBoard } = gameSlice.actions
 export default gameSlice.reducer

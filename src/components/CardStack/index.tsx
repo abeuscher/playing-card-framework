@@ -1,9 +1,10 @@
 // components/CardStack.tsx
 
+import { ConnectDropTarget, useDrop } from 'react-dnd'
+
 import Card from '@/components/Card'
 import { CardStack as CardStackType } from '@/types'
 import styles from './CardStack.module.scss'
-import { useDrop } from 'react-dnd'
 
 interface CardStackProps {
   stack: CardStackType
@@ -21,7 +22,12 @@ const CardStack: React.FC<CardStackProps> = ({ stack, onCardDrag, onCardDrop }) 
       collect: (monitor) => ({
         isOver: monitor.isOver(),
         canDrop: monitor.canDrop()
-      })
+      }),
+      hover: (item, monitor) => {
+        if (!monitor.canDrop()) {
+          return
+        }
+      }
     }),
     [stack.id]
   )
