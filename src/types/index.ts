@@ -1,5 +1,7 @@
 // types.ts
 
+import { init } from "next/dist/compiled/webpack/webpack"
+
 // Enum for suit and rank of playing cards
 export enum Suit {
   Hearts = 'Hearts',
@@ -73,23 +75,17 @@ export interface CardStackBehavior {
 export interface CardStack {
   id: string
   cards: Card[]
-  layout: CardStackLayout
-  behavior: CardStackBehavior
-}
-
-// Enum for different types of card slots on the game board
-export enum CardSlotType {
-  Deck = 'Deck',
-  DiscardPile = 'DiscardPile',
-  Foundation = 'Foundation',
-  Tableau = 'Tableau'
+  initialCards?: number
+  layout?: CardStackLayout
+  behavior?: CardStackBehavior
 }
 
 // Interface for a card slot on the game board
 export interface CardSlot {
   id: string
-  type: CardSlotType
   stacks: CardStack[]
+  layout: CardStackLayout
+  behavior: CardStackBehavior  
 }
 
 // Interface for the game board
@@ -105,24 +101,4 @@ export interface GameState {
   currentTurn: number
   selectedCardId: string | null
   destinationStackId: string | null
-}
-
-// Function types for game actions
-export type MoveCardFunction = (fromSlotId: string, toSlotId: string, cardId: string) => void
-export type FlipCardFunction = (cardId: string) => void
-export type ShuffleDeckFunction = (deckId: string) => void
-
-// Interface for the game context
-export interface GameContext {
-  state: GameState
-  moveCard: MoveCardFunction
-  flipCard: FlipCardFunction
-  shuffleDeck: ShuffleDeckFunction
-}
-
-// Optional: Type for player actions if multiplayer is considered
-export interface PlayerAction {
-  playerId: string
-  actionType: 'move' | 'flip' | 'shuffle'
-  payload: any
 }

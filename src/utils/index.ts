@@ -1,8 +1,17 @@
 // cardLibrary.ts
 
-import { Card, CardDeck, CardSlot, CardSlotType, CardStack, CardStackBehavior, CardStackLayout, GameBoard, Rank, Suit } from '@/types'
+import {
+  Card,
+  CardDeck,
+  CardSlot,
+  CardStackBehavior,
+  CardStackLayout,
+  GameBoard,
+  Rank,
+  Suit
+} from '@/types'
 
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 
 export class CardGameLibrary {
   private static generateDeck(id: number): CardDeck {
@@ -30,7 +39,7 @@ export class CardGameLibrary {
       arrangement: 'stacked',
       direction: 'up',
       faceUp: true
-    };
+    }
   }
 
   public static createDefaultCardStackBehavior(): CardStackBehavior {
@@ -39,8 +48,9 @@ export class CardGameLibrary {
       canDrop: true,
       minimumCards: 0,
       maximumCards: Infinity
-    };
+    }
   }
+
   public static createDecks(numberOfDecks: number = 1): CardDeck[] {
     let decks: CardDeck[] = []
     for (let i = 0; i < numberOfDecks; i++) {
@@ -57,37 +67,24 @@ export class CardGameLibrary {
     return deck
   }
 
-  public static createCardStack(cards: Card[]): CardStack {
-    return {
-      id: `stack-${uuidv4()}`,
-      cards,
-      layout: this.createDefaultCardStackLayout(),
-      behavior: this.createDefaultCardStackBehavior()
-    }
-  }
-
-  public static createCardSlot(type: CardSlotType, stack: CardStack): CardSlot {
-    return {
-      id: `slot-${uuidv4()}`,
-      type,
-      stacks: [stack]
-    }
-  }
-
-  public static dealCardsToSlots(deck: Card[], slots: CardSlot[], cardsPerSlot: number): void {
+  public static dealCardsToSlots(deck: Card[], slots: CardSlot[]): void {
     let deckIndex = 0
     for (const slot of slots) {
-      for (let i = 0; i < cardsPerSlot; i++) {
-        if (deckIndex < deck.length) {
-          slot.stacks[0].cards.push(deck[deckIndex])
-          deckIndex++
+      for (const stack of slot.stacks) {
+        if (stack.initialCards) {
+          for (let i = 0; i < stack.initialCards; i++) {
+            if (deckIndex < deck.length) {
+              stack.cards.push(deck[deckIndex])
+              deckIndex++
+            }
+          }
         }
       }
     }
   }
 
   public static initializeGameBoard(
-    slotTypes: CardSlotType[],
+    slots: CardSlot[],
     cardsPerSlot: number,
     numberOfDecks: number = 1
   ): GameBoard {
@@ -96,15 +93,11 @@ export class CardGameLibrary {
       this.shuffleDeck(deck.cards)
     }
 
-    const slots: CardSlot[] = slotTypes.map((type) =>
-      this.createCardSlot(type, this.createCardStack([]))
-    )
-
-    this.dealCardsToSlots(decks[0].cards, slots, cardsPerSlot)
+    this.dealCardsToSlots(decks[0].cards, slots)
 
     return {
       id: `board-${uuidv4()}`,
-      slots,
+      slots
     }
   }
 }
