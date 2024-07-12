@@ -1,7 +1,5 @@
 // types.ts
 
-import { init } from "next/dist/compiled/webpack/webpack"
-
 // Enum for suit and rank of playing cards
 export enum Suit {
   Hearts = 'Hearts',
@@ -41,19 +39,19 @@ export type CardDeck = {
 }
 
 export const CardClassMap = {
-  Ace: 'card-a',
-  Two: 'card-2',
-  Three: 'card-3',
-  Four: 'card-4',
-  Five: 'card-5',
-  Six: 'card-6',
-  Seven: 'card-7',
-  Eight: 'card-8',
-  Nine: 'card-9',
-  Ten: 'card-10',
-  Jack: 'card-j',
-  Queen: 'card-q',
-  King: 'card-k'
+  Ace: 'a',
+  Two: '2',
+  Three: '3',
+  Four: '4',
+  Five: '5',
+  Six: '6',
+  Seven: '7',
+  Eight: '8',
+  Nine: '9',
+  Ten: '10',
+  Jack: 'j',
+  Queen: 'q',
+  King: 'k'
 }
 
 export interface CardStackLayout {
@@ -84,8 +82,6 @@ export interface CardStack {
 export interface CardSlot {
   id: string
   stacks: CardStack[]
-  layout: CardStackLayout
-  behavior: CardStackBehavior  
 }
 
 // Interface for the game board

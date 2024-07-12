@@ -1,6 +1,8 @@
 import { GameBoard, GameState } from '@/types'
 import { PayloadAction, createSlice, current } from '@reduxjs/toolkit'
 
+import { CardGameLibrary } from '@/utils'
+
 const initialState: GameState = {
   board: {
     id: 'board-1',
@@ -16,12 +18,12 @@ const gameSlice = createSlice({
   name: 'game',
   initialState,
   reducers: {
-    initializeGame: (state) => {
-      console.log('Game Init')
+    initializeGame: (state, action: PayloadAction<{ board: GameBoard }>) => {
+      const newBoard = CardGameLibrary.initializeGameBoard(action.payload.board, 1)
+      state.board = newBoard
     },
     moveCard: (state, action: PayloadAction<{ destinationId: string }>) => {
       state.destinationStackId = action.payload.destinationId
-      console.log('moveCard', state.selectedCardId, state.destinationStackId)
       if (!state.selectedCardId || !state.destinationStackId) {
         return
       }
@@ -44,17 +46,14 @@ const gameSlice = createSlice({
             ?.cards.push(theCard)
         }
       }
+       state.destinationStackId = ``
+       state.selectedCardId = ``
     },
     dragCard: (state, action: PayloadAction<{ cardId: string }>): void => {
-      //console.log('dragCard', action.payload.cardId)
       state.selectedCardId = action.payload.cardId
-    },
-    setGameBoard: (state, action: PayloadAction<{ board: GameBoard }>) => {
-      //console.log('setGameBoard', action.payload.board)
-      state.board = action.payload.board
     }
   }
 })
 
-export const { initializeGame, moveCard, dragCard, setGameBoard } = gameSlice.actions
+export const { initializeGame, moveCard, dragCard } = gameSlice.actions
 export default gameSlice.reducer

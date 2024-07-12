@@ -13,3 +13,24 @@
   border-color: #666;
   background-color: rgba(0, 255, 0, 0.1);
 }
+.cardstack-stacked {
+  display: flex;
+  & > div {
+    width: 0.5px;
+  }
+}
+.cardstack-fan {
+  width: 100%;
+  display: flex;
+  & > div {
+    flex-basis: 50px;
+    transform: rotate(10deg);
+  }
+}
+.cardstack-spread {
+  width: 100%;
+  display: flex;
+  & > div {
+    flex-basis: 50px;
+  }
+}

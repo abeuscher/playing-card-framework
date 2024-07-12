@@ -1,10 +1,9 @@
 // components/CardStack.tsx
 
-import { ConnectDropTarget, useDrop } from 'react-dnd'
-
 import Card from '@/components/Card'
 import { CardStack as CardStackType } from '@/types'
 import styles from './CardStack.module.scss'
+import { useDrop } from 'react-dnd'
 
 interface CardStackProps {
   stack: CardStackType
@@ -33,7 +32,9 @@ const CardStack: React.FC<CardStackProps> = ({ stack, onCardDrag, onCardDrop }) 
   )
 
   return dropRef(
-    <div className={`${styles.cardStack} ${isOver && canDrop ? styles.highlight : ''}`}>
+    <div
+      className={`${styles.cardStack} ${styles[`cardstack-${stack.layout?.arrangement?.toLowerCase()}`] ?? ''} ${isOver && canDrop ? styles.highlight : ''}`}
+    >
       {stack.cards.map((card) => (
         <Card key={card.id} card={card} onCardDrag={onCardDrag} draggable={true} />
       ))}

@@ -84,20 +84,14 @@ export class CardGameLibrary {
   }
 
   public static initializeGameBoard(
-    slots: CardSlot[],
-    cardsPerSlot: number,
+    gameBoard: GameBoard,
     numberOfDecks: number = 1
   ): GameBoard {
     const decks = this.createDecks(numberOfDecks)
     for (const deck of decks) {
       this.shuffleDeck(deck.cards)
     }
-
-    this.dealCardsToSlots(decks[0].cards, slots)
-
-    return {
-      id: `board-${uuidv4()}`,
-      slots
-    }
+    this.dealCardsToSlots(decks[0].cards, gameBoard.slots)
+    return gameBoard
   }
 }

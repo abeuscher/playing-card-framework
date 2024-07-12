@@ -2,6 +2,7 @@
 
 import { CardClassMap, Card as CardType } from '@/types'
 
+import Image from 'next/image'
 import styles from './Card.module.scss'
 import { useDrag } from 'react-dnd'
 
@@ -26,7 +27,7 @@ const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
 
   const getCardClass = (card: CardType) => {
     const suitClass = styles[`card-${card.suit.toLowerCase()}`]
-    const rankClass = styles[CardClassMap[card.rank]]
+    const rankClass = styles[`card-${CardClassMap[card.rank]}`]
     const faceClass = card.faceUp ? '' : styles['card-facedown']
     const hoverClass = isDragging ? styles['card-hover'] : ''
     return `${styles.card} ${suitClass} ${rankClass} ${faceClass} ${hoverClass}`
@@ -36,6 +37,16 @@ const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
       <span></span>
     </div>
   )
+  const ImageComponent = () => (
+    <Image
+      className={styles['card-hover']}
+      src={`/images/svg/${CardClassMap[card.rank]}${card.suit.charAt(0).toLowerCase()}.svg`}
+      alt={`${CardClassMap[card.rank]} of ${card.suit.charAt(0).toLowerCase()}`}
+      width={100}
+      height={150}
+    />
+  )
+
   return draggable ? (
     dragRef(
       <div>
