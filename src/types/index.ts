@@ -1,5 +1,3 @@
-// types.ts
-
 // Enum for suit and rank of playing cards
 export enum Suit {
   Hearts = 'Hearts',
@@ -55,18 +53,11 @@ export const CardClassMap = {
 }
 
 export interface CardStackLayout {
-  name: string // e.g. 'Tableau'
-  description: string // e.g. 'Tableau stack'
+  name: string
+  description: string
   arrangement: 'stacked' | 'spread' | 'fan' 
   direction: 'left' | 'right' | 'up' | 'down'
   faceUp: boolean
-}
-
-export interface CardStackBehavior {
-  canDrag: boolean
-  canDrop: boolean
-  minimumCards: number
-  maximumCards: number
 }
 
 // Interface for a card stack
@@ -74,8 +65,9 @@ export interface CardStack {
   id: string
   cards: Card[]
   initialCards?: number
+  order: 'ascending' | 'descending'
+  rules: string[]
   layout?: CardStackLayout
-  behavior?: CardStackBehavior
 }
 
 // Interface for a card slot on the game board

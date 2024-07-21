@@ -1,10 +1,7 @@
-// cardLibrary.ts
-
 import {
   Card,
   CardDeck,
   CardSlot,
-  CardStackBehavior,
   CardStackLayout,
   GameBoard,
   Rank,
@@ -14,6 +11,9 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 
 export class CardGameLibrary {
+
+  private static suitOrder = ['hearts', 'diamonds', 'clubs', 'spades'];
+  
   private static generateDeck(id: number): CardDeck {
     const deck: CardDeck = { id: `deck-${id}-${uuidv4()}`, cards: [], className: 'red' }
     const suits = Object.values(Suit)
@@ -39,15 +39,6 @@ export class CardGameLibrary {
       arrangement: 'stacked',
       direction: 'up',
       faceUp: true
-    }
-  }
-
-  public static createDefaultCardStackBehavior(): CardStackBehavior {
-    return {
-      canDrag: true,
-      canDrop: true,
-      minimumCards: 0,
-      maximumCards: Infinity
     }
   }
 
@@ -88,10 +79,44 @@ export class CardGameLibrary {
     numberOfDecks: number = 1
   ): GameBoard {
     const decks = this.createDecks(numberOfDecks)
+
     for (const deck of decks) {
       this.shuffleDeck(deck.cards)
     }
+
     this.dealCardsToSlots(decks[0].cards, gameBoard.slots)
     return gameBoard
   }
+
+  public static isNext(cards: Card[], newCard: Card): boolean {
+    if (cards.length === 0) return true;
+    const lastCard = cards[cards.length - 1];
+    return Object.keys(Rank).indexOf(lastCard.rank) === Object.keys(Rank).indexOf(newCard.rank) - 1
+  };
+  
+  public static isPrevious(cards: Card[], newCard: Card): boolean {
+    if (cards.length === 0) return true;
+    const lastCard = cards[cards.length - 1];
+    return Object.keys(Rank).indexOf(lastCard.rank) === Object.keys(Rank).indexOf(newCard.rank) + 1
+  };
+  
+  public static isSameSuit(cards: Card[], newCard: Card): boolean {
+    if (cards.length === 0) return true;
+    const lastCard = cards[cards.length - 1];
+    return lastCard.suit === newCard.suit;
+  };
+  
+  public static isSameRank (cards: Card[], newCard: Card): boolean {
+    if (cards.length === 0) return true;
+    const lastCard = cards[cards.length - 1];
+    return lastCard.rank === newCard.rank;
+  };
+  
+  public static isAlternateColor(cards: Card[], newCard: Card): boolean {
+    if (cards.length === 0) return true;
+    const lastCard = cards[cards.length - 1];
+    const isRed = (suit: string) => suit === 'hearts' || suit === 'diamonds';
+    return isRed(lastCard.suit.toLowerCase()) !== isRed(newCard.suit.toLowerCase());
+  };
+
 }

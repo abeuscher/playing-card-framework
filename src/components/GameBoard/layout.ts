@@ -10,19 +10,15 @@ export const BasicLayout: GameBoard = {
         {
           id: 'opponent-hand',
           cards: new Array(),
-          initialCards: 2,
+          initialCards: 0,
+          order: 'ascending',
+          rules: ['next','sameSuit'],
           layout: {
             name: 'Hand',
             description: 'Left to right',
             arrangement: 'spread',
             direction: 'right',
             faceUp: false
-          },
-          behavior: {
-            canDrag: true,
-            canDrop: true,
-            minimumCards: 0,
-            maximumCards: 52
           }
         }
       ]
@@ -34,6 +30,8 @@ export const BasicLayout: GameBoard = {
           id: 'discard-pile',
           cards: new Array(),
           initialCards: 0,
+          order: 'descending',
+          rules: ['previous'],
           layout: {
             name: 'Tableau',
             description: 'Tableau stack',
@@ -41,17 +39,13 @@ export const BasicLayout: GameBoard = {
             direction: 'up',
             faceUp: true
           },
-          behavior: {
-            canDrag: true,
-            canDrop: true,
-            minimumCards: 0,
-            maximumCards: 52
-          }
         },
         {
           id: 'draw-pile',
           cards: new Array(),
           initialCards: 0,
+          order: 'ascending',
+          rules: ['sameRank'],
           layout: {
             name: 'Stack',
             description: 'stack',
@@ -59,12 +53,6 @@ export const BasicLayout: GameBoard = {
             direction: 'up',
             faceUp: false
           },
-          behavior: {
-            canDrag: true,
-            canDrop: true,
-            minimumCards: 0,
-            maximumCards: 52
-          }
         }
       ]
     },
@@ -74,7 +62,9 @@ export const BasicLayout: GameBoard = {
         {
           id: 'player-hand',
           cards: new Array(),
-          initialCards: 2,
+          initialCards: 32,
+          order: 'ascending',
+          rules: [],
           layout: {
             name: 'Hand',
             description: 'Left to right',
@@ -82,12 +72,6 @@ export const BasicLayout: GameBoard = {
             direction: 'right',
             faceUp: false
           },
-          behavior: {
-            canDrag: true,
-            canDrop: true,
-            minimumCards: 0,
-            maximumCards: 52
-          }
         }
       ]
     }
