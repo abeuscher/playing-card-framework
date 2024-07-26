@@ -96,7 +96,10 @@ const gameSlice = createSlice({
         state.selectedCardId = ``
         return
       }
-      state.board.slots[destinationSlotIndex].stacks[destinationStackIndex].cards.push(state.board.slots[slotIndex].stacks[stackIndex].cards.splice(cardIndex, 1)[0])
+      const splicedCard = state.board.slots[slotIndex].stacks[stackIndex].cards.splice(cardIndex, 1)[0]
+      const destinationStack = state.board.slots[destinationSlotIndex].stacks[destinationStackIndex]
+      splicedCard.faceUp = destinationStack?.layout?.faceUp || false
+      state.board.slots[destinationSlotIndex].stacks[destinationStackIndex].cards.push(splicedCard)
       state.destinationStackId = ``
       state.selectedCardId = ``
     },

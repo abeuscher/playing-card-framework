@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { BasicLayout } from './layout'
 import CardSlot from '@/components/CardSlot'
 import { RootState } from '@/store'
+import styles from '@/components/GameBoard/GameBoard.module.scss'
 import { useEffect } from 'react'
 
 const GameBoard = () => {
@@ -25,10 +26,10 @@ const GameBoard = () => {
     dispatch(dragCard({ cardId: cardId }))
   }
   return (
-    <div className="game-board">
+    <div className={styles['game-board']}>
       {gameBoard.slots &&
         gameBoard.slots.map((slot) => (
-          <div key={slot.id} className="card-slot">
+          <div key={slot.id} className={styles['card-slot']}>
             <CardSlot stacks={slot.stacks} onCardDrag={onCardDrag} onCardDrop={onCardDrop} />
           </div>
         ))}

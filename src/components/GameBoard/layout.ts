@@ -10,9 +10,9 @@ export const BasicLayout: GameBoard = {
         {
           id: 'opponent-hand',
           cards: new Array(),
-          initialCards: 0,
+          initialCards: 5,
           order: 'ascending',
-          rules: ['next','sameSuit'],
+          rules: [],
           layout: {
             name: 'Hand',
             description: 'Left to right',
@@ -27,31 +27,31 @@ export const BasicLayout: GameBoard = {
       id: 'play-area',
       stacks: [
         {
-          id: 'discard-pile',
+          id: 'draw-pile',
           cards: new Array(),
-          initialCards: 0,
-          order: 'descending',
-          rules: ['previous'],
+          initialCards: 42,
+          order: 'ascending',
+          rules: [],
           layout: {
-            name: 'Tableau',
-            description: 'Tableau stack',
+            name: 'Stack',
+            description: 'Draw Pile',
             arrangement: 'stacked',
-            direction: 'up',
-            faceUp: true
+            direction: 'down',
+            faceUp: false
           },
         },
         {
-          id: 'draw-pile',
+          id: 'discard-pile',
           cards: new Array(),
           initialCards: 0,
           order: 'ascending',
-          rules: ['sameRank'],
+          rules: [],
           layout: {
             name: 'Stack',
             description: 'stack',
             arrangement: 'stacked',
             direction: 'up',
-            faceUp: false
+            faceUp: true
           },
         }
       ]
@@ -62,7 +62,7 @@ export const BasicLayout: GameBoard = {
         {
           id: 'player-hand',
           cards: new Array(),
-          initialCards: 32,
+          initialCards: 5,
           order: 'ascending',
           rules: [],
           layout: {
@@ -70,7 +70,7 @@ export const BasicLayout: GameBoard = {
             description: 'Left to right',
             arrangement: 'spread',
             direction: 'right',
-            faceUp: false
+            faceUp: true
           },
         }
       ]

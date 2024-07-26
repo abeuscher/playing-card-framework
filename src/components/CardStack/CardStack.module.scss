@@ -1,7 +1,7 @@
 /* styles/CardStack.module.scss */
 .cardStack {
   position: relative;
-  width: 15em;
+  min-width: 5em;
   height: 7em;
   margin: 0.3em;
   background-color: #ccc;
@@ -16,7 +16,7 @@
 .cardstack-stacked {
   display: flex;
   & > div {
-    width: 0.5px;
+    width: 0.1px;
   }
 }
 .cardstack-fan {

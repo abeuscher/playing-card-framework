@@ -32,15 +32,6 @@ export class CardGameLibrary {
     }
     return deck
   }
-  public static createDefaultCardStackLayout(): CardStackLayout {
-    return {
-      name: 'CardStack',
-      description: 'Default Card Stack',
-      arrangement: 'stacked',
-      direction: 'up',
-      faceUp: true
-    }
-  }
 
   public static createDecks(numberOfDecks: number = 1): CardDeck[] {
     let decks: CardDeck[] = []
@@ -65,6 +56,7 @@ export class CardGameLibrary {
         if (stack.initialCards) {
           for (let i = 0; i < stack.initialCards; i++) {
             if (deckIndex < deck.length) {
+              deck[deckIndex].faceUp = stack.layout?.faceUp || false
               stack.cards.push(deck[deckIndex])
               deckIndex++
             }
@@ -103,6 +95,7 @@ export class CardGameLibrary {
   public static isSameSuit(cards: Card[], newCard: Card): boolean {
     if (cards.length === 0) return true;
     const lastCard = cards[cards.length - 1];
+    console.log(lastCard.suit, newCard.suit)
     return lastCard.suit === newCard.suit;
   };
   

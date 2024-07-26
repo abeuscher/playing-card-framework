@@ -38,6 +38,7 @@ const CardStack: React.FC<CardStackProps> = ({ stack, onCardDrag, onCardDrop }) 
       {stack.cards.map((card) => (
         <Card key={card.id} card={card} onCardDrag={onCardDrag} draggable={true} />
       ))}
+      <p className="stack-label">{stack.rules.join(', ')}</p>
     </div>
   )
 }

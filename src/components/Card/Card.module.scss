@@ -91,9 +91,30 @@
       display: none;
     }
   }
+  &:active {
+    z-index: 99;
+  }
 }
 .card-hover {
-  display: none;
+  display: block;
+}
+.card-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.card-wrapper-dragging {
+  z-index: 1000;
+  cursor: move;
+  &:active {
+    transform: scale(1.1);
+  }
+}
+.card-nohover {
+  &:active {
+    transform: scale(1.1);
+  }
 }
 // suit colors
 .card-hearts,
