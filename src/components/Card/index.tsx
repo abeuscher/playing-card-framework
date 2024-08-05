@@ -44,6 +44,7 @@ const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
         className={getCardClass(card)}
         src={`/images/svg/${CardClassMap[card.rank]}${card.suit.charAt(0).toLowerCase()}.svg`}
         alt={`${CardClassMap[card.rank]} of ${card.suit.charAt(0).toLowerCase()}`}
+        title={`${CardClassMap[card.rank]} of ${card.suit.charAt(0).toLowerCase()}`}
         width={100}
         height={150}
       />
@@ -64,7 +65,8 @@ const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
           <Image
             className={getCardClass(card)}
             src={`/images/svg/${CardClassMap[card.rank]}${card.suit.charAt(0).toLowerCase()}.svg`}
-            alt={`${CardClassMap[card.rank]} of ${card.suit.charAt(0).toLowerCase()}`}
+            alt={`${card.rank} of ${card.suit}`}
+            title={`${card.rank} of ${card.suit}`}
             width={100}
             height={150}
           />

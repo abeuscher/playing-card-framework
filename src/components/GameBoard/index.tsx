@@ -1,19 +1,29 @@
 'use client'
 
-import { dragCard, initializeGame, moveCard } from '@/store/gameSlice'
+import { dragCard, findPokerWinner, initializeGame, moveCard } from '@/store/gameSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useRef } from 'react'
 
 import { BasicLayout } from './layout'
 import CardSlot from '@/components/CardSlot'
 import { RootState } from '@/store'
 import styles from '@/components/GameBoard/GameBoard.module.scss'
-import { useEffect } from 'react'
 
 const GameBoard = () => {
+  const initRef = useRef(false)
   const dispatch = useDispatch()
   const gameBoard = useSelector((state: RootState) => state.game.board)
   useEffect(() => {
-    dispatch(initializeGame({ board: JSON.parse(JSON.stringify(BasicLayout)) }))
+    if (!initRef.current) {
+      initRef.current = true
+
+      const initGame = async () => {
+        await dispatch(initializeGame({ board: JSON.parse(JSON.stringify(BasicLayout)) }))
+        dispatch(findPokerWinner())
+      }
+
+      initGame()
+    }
   }, [dispatch])
 
   if (!gameBoard) {

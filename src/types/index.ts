@@ -1,9 +1,9 @@
 // Enum for suit and rank of playing cards
 export enum Suit {
+  Spades = 'Spades',
   Hearts = 'Hearts',
   Diamonds = 'Diamonds',
-  Clubs = 'Clubs',
-  Spades = 'Spades'
+  Clubs = 'Clubs'
 }
 
 export enum Rank {
@@ -28,12 +28,6 @@ export interface Card {
   rank: Rank
   faceUp: boolean
   deckId: string
-}
-
-export type CardDeck = {
-  id: string
-  className: string
-  cards: Card[]
 }
 
 export const CardClassMap = {

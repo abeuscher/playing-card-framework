@@ -18,7 +18,7 @@ export const BasicLayout: GameBoard = {
             description: 'Left to right',
             arrangement: 'spread',
             direction: 'right',
-            faceUp: false
+            faceUp: true
           }
         }
       ]

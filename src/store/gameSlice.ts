@@ -2,6 +2,7 @@ import { GameBoard, GameState } from '@/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
 import { CardGameLibrary } from '@/utils'
+import PokerHandEvaluator from '@/utils/pokerhandevaluator'
 
 const initialState: GameState = {
   board: {
@@ -73,7 +74,7 @@ const gameSlice = createSlice({
   initialState,
   reducers: {
     initializeGame: (state, action: PayloadAction<{ board: any }>) => {
-      state.board = CardGameLibrary.initializeGameBoard(action.payload.board, 1)
+      state.board = CardGameLibrary.initializeGameBoard(action.payload.board)
     },
     moveCard: (state, action: PayloadAction<{ destinationId: string }>) => {
       state.destinationStackId = action.payload.destinationId
@@ -105,9 +106,14 @@ const gameSlice = createSlice({
     },
     dragCard: (state, action: PayloadAction<{ cardId: string }>): void => {
       state.selectedCardId = action.payload.cardId
+    },
+    findPokerWinner: (state) => {
+      const playerHand = {"player":"player", "hand":state.board.slots[2].stacks[0].cards }
+      const opponentHand = {"player":"opponent", "hand":state.board.slots[0].stacks[0].cards }
+      console.log(PokerHandEvaluator.evaluateWinner([playerHand, opponentHand]))
     }
   }
 })
 
-export const { initializeGame, moveCard, dragCard } = gameSlice.actions
+export const { initializeGame, moveCard, dragCard, findPokerWinner } = gameSlice.actions
 export default gameSlice.reducer
