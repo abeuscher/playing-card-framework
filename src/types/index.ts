@@ -67,6 +67,7 @@ export interface CardStack {
 // Interface for a card slot on the game board
 export interface CardSlot {
   id: string
+  title?: string
   stacks: CardStack[]
 }
 
@@ -83,4 +84,24 @@ export interface GameState {
   currentTurn: number
   selectedCardId: string | null
   destinationStackId: string | null
+  outcome: Outcome | null
+  message: MessageBox | null
+}
+
+export interface Outcome {
+  winner: string;
+  handName: string;
+  handRank: number;
+  isTie: boolean;
+}
+
+export interface PlayerHand {
+  player: string;
+  hand: Card[];
+}
+
+export interface MessageBox {
+  message: string;
+  type: 'info' | 'warning' | 'error';
+  duration: number;
 }

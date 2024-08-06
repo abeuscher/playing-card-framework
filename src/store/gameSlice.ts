@@ -1,4 +1,4 @@
-import { GameBoard, GameState } from '@/types'
+import { GameBoard, GameState, Outcome } from '@/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
 import { CardGameLibrary } from '@/utils'
@@ -12,7 +12,9 @@ const initialState: GameState = {
   history: [],
   currentTurn: 0,
   selectedCardId: null,
-  destinationStackId: null
+  destinationStackId: null,
+  outcome: {} as Outcome,
+  message: null
 }
 
 const findCard = (board: GameBoard, cardId: string) => {
@@ -110,7 +112,7 @@ const gameSlice = createSlice({
     findPokerWinner: (state) => {
       const playerHand = {"player":"player", "hand":state.board.slots[2].stacks[0].cards }
       const opponentHand = {"player":"opponent", "hand":state.board.slots[0].stacks[0].cards }
-      console.log(PokerHandEvaluator.evaluateWinner([playerHand, opponentHand]))
+      state.outcome = PokerHandEvaluator.evaluateWinner([playerHand, opponentHand])
     }
   }
 })

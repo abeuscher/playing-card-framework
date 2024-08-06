@@ -1,4 +1,4 @@
-import { Card, Rank, Suit } from '@/types/'
+import { Card, Outcome, Rank, Suit } from '@/types/'
 
 /**
  * Class for evaluating poker hands and determining winners.
@@ -188,12 +188,7 @@ private static isStraight(cards: Card[]): boolean {
    * @returns An object containing the winner's name, hand name, hand rank, and whether it's a tie.
    * @throws Error if no players are provided.
    */
-  public static evaluateWinner(players: Array<{ player: string; hand: Card[] }>): {
-    winner: string;
-    handName: string;
-    handRank: number;
-    isTie: boolean;
-  } {
+  public static evaluateWinner(players: Array<{ player: string; hand: Card[] }>): Outcome {
     if (players.length === 0) {
       throw new Error('At least one player is required');
     }

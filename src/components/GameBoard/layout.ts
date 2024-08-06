@@ -6,6 +6,7 @@ export const BasicLayout: GameBoard = {
   slots: [
     {
       id: 'opponent-slot',
+      title: 'Opponent',
       stacks: [
         {
           id: 'opponent-hand',
@@ -58,6 +59,7 @@ export const BasicLayout: GameBoard = {
     },
     {
       id: 'player-slot',
+      title: 'Player',
       stacks: [
         {
           id: 'player-hand',
