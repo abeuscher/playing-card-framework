@@ -10,7 +10,7 @@ export const BasicLayout: GameBoard = {
         {
           id: 'opponent-hand',
           cards: new Array(),
-          initialCards: 5,
+          initialCards: 7,
           order: 'ascending',
           rules: [],
           layout: {
@@ -29,7 +29,7 @@ export const BasicLayout: GameBoard = {
         {
           id: 'draw-pile',
           cards: new Array(),
-          initialCards: 42,
+          initialCards: 38,
           order: 'ascending',
           rules: [],
           layout: {
@@ -62,7 +62,7 @@ export const BasicLayout: GameBoard = {
         {
           id: 'player-hand',
           cards: new Array(),
-          initialCards: 5,
+          initialCards: 7,
           order: 'ascending',
           rules: [],
           layout: {
