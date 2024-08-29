@@ -33,6 +33,7 @@ const findCard = (board: GameBoard, cardId: string) => {
   }
 }
 
+
 const findStack = (board: GameBoard, stackId: string) => {
   const slot =
     board.slots.find((slot) => {
@@ -117,18 +118,33 @@ const gameSlice = createSlice({
     dragCard: (state, action: PayloadAction<{ cardId: string }>): void => {
       state.selectedCardId = action.payload.cardId
     },
+    dealCard: (state, action: PayloadAction<{ sourceStack: string, destinationStack: string, numCards: number }>): void => {
+      const { destinationStack, sourceStack, numCards } = action.payload
+      const { destinationSlotIndex, destinationStackIndex } = findStack(state.board, destinationStack)
+      const { slotIndex, stackIndex, cardIndex } = findCard(state.board, sourceStack)
+      const splicedCards = state.board.slots[slotIndex].stacks[stackIndex].cards.splice(cardIndex, numCards)
+      const destinationStackObj = state.board.slots[destinationSlotIndex].stacks[destinationStackIndex]
+      splicedCards.map((card: any) => {
+        card.faceUp = destinationStackObj?.layout?.faceUp || false
+      })
+      state.board.slots[destinationSlotIndex].stacks[destinationStackIndex].cards.concat(splicedCards)
+    },
     findPokerWinner: (state) => {
       state.outcome = PokerHandEvaluator.evaluateWinner(
         state.playerHands
       );
+      const handsCopy = JSON.parse(JSON.stringify(state.outcome.hands))
+      console.log(handsCopy)
       state.outcome.hands.map((hand) => {
         hand.cards.forEach((card: any) => {
-          const playerHand = state.playerHands.find((h) => h.id === hand.id)
-          const cardInHand = playerHand?.cards.find((c) => c.id === card.id)
-          if (cardInHand) {
-            cardInHand.isSelected = true
-          }
-          
+          const hands = state.playerHands.find((h) => h.isHand)
+          if (hands) {
+            hands.cards.map((playerCard) => {
+              if (playerCard.id === card.id) {
+                playerCard.isSelected = true
+              }
+            })
+          }       
         })
       });
     },

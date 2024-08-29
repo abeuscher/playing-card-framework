@@ -354,9 +354,12 @@ export default class PokerHandEvaluator {
       .sort((a, b) => this.compareRanks(b.rank, a.rank))
     return this.getBestStraight(flushCards).slice(0, 5)
   }
-
   private static getBestFourOfAKind(cards: Card[]): Card[] {
     const quads = this.findNOfAKind(cards, 4)
+    if (quads.length === 0) {
+      // If no four of a kind, return the highest 5 cards
+      return this.getHighCards(cards, 5)
+    }
     const kicker = this.getHighCards(
       cards.filter((card) => card.rank !== quads[0].rank),
       1
@@ -366,10 +369,18 @@ export default class PokerHandEvaluator {
 
   private static getBestFullHouse(cards: Card[]): Card[] {
     const trips = this.findNOfAKind(cards, 3)
+    if (trips.length === 0) {
+      // If no three of a kind, return the highest 5 cards
+      return this.getHighCards(cards, 5)
+    }
     const pairs = this.findNOfAKind(
       cards.filter((card) => card.rank !== trips[0].rank),
       2
     )
+    if (pairs.length === 0) {
+      // If no pair after three of a kind, return the highest 5 cards
+      return this.getHighCards(cards, 5)
+    }
     return [...trips, ...pairs.slice(0, 2)]
   }
 
@@ -416,21 +427,21 @@ export default class PokerHandEvaluator {
   }
 
   private static getBestTwoPair(cards: Card[]): Card[] {
-    const pairs = this.findNOfAKind(cards, 2).sort((a, b) => this.compareRanks(b.rank, a.rank));
-    
+    const pairs = this.findNOfAKind(cards, 2).sort((a, b) => this.compareRanks(b.rank, a.rank))
+
     if (pairs.length < 2) {
-      return this.getHighCards(cards, 5);
+      return this.getHighCards(cards, 5)
     }
-    
-    const bestPairs = pairs.slice(0, 2).flat();
+
+    const bestPairs = pairs.slice(0, 2).flat()
     const kickers = this.getHighCards(
-      cards.filter(card => !bestPairs.some(pairCard => pairCard.rank === card.rank)),
+      cards.filter((card) => !bestPairs.some((pairCard) => pairCard.rank === card.rank)),
       5 - bestPairs.length
-    );
-  
-    return [...bestPairs, ...kickers].slice(0, 5);
+    )
+
+    return [...bestPairs, ...kickers].slice(0, 5)
   }
-  
+
   private static getBestOnePair(cards: Card[]): Card[] {
     const pair = this.findNOfAKind(cards, 2)
     if (pair.length === 0) return this.getHighCards(cards, 5)
