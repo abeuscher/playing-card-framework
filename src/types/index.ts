@@ -95,13 +95,13 @@ export interface GameState {
 }
 
 
-export type Outcome = {
+type Outcome = {
   winners: Array<CardStack>;
   losers: Array<CardStack>;
   handName: string;
   handRank: number;
-  hands: Array<any>;
-};
+  hands: Array<{ id: string; cards: Card[] }>;
+}
 
 export interface MessageBox {
   message: string;

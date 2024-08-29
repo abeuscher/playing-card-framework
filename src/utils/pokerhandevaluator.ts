@@ -264,15 +264,15 @@ export default class PokerHandEvaluator {
     if (players.length === 0) {
       throw new Error('At least one player is required')
     }
-
+  
     let winners: Array<CardStack> = [players[0]]
     let losers: Array<CardStack> = []
     let winningHand = this.evaluateHand(players[0].cards)
-
+  
     for (let i = 1; i < players.length; i++) {
       const currentPlayer = players[i]
       const currentHand = this.evaluateHand(currentPlayer.cards)
-
+  
       if (currentHand.rank > winningHand.rank) {
         losers = losers.concat(winners)
         winners = [currentPlayer]
@@ -295,22 +295,21 @@ export default class PokerHandEvaluator {
         losers.push(currentPlayer)
       }
     }
-    const selectHands = winners
-      .map((winner) => {
-        return this.getBestFiveCardHand(winner.cards, winningHand.name)
-      })
-      .concat(
-        losers.map((loser) => {
-          return this.getBestFiveCardHand(loser.cards, winningHand.name)
-        })
-      )
-
+  
+    const hands = players.map((player) => {
+      const playerHandType = this.evaluateHand(player.cards).name
+      return {
+        id: player.id,
+        cards: this.getBestFiveCardHand(player.cards, playerHandType)
+      }
+    })
+  
     return {
       winners: winners,
       losers: losers,
       handName: winningHand.name,
       handRank: winningHand.rank,
-      hands: selectHands
+      hands: hands
     }
   }
 
@@ -334,9 +333,8 @@ export default class PokerHandEvaluator {
       case 'One Pair':
         return this.getBestOnePair(cards)
       case 'High Card':
-        return this.getHighCards(cards, 5)
       default:
-        throw new Error(`Unknown hand type: ${handType}`)
+        return this.getHighCards(cards, 5)
     }
   }
 
@@ -391,18 +389,23 @@ export default class PokerHandEvaluator {
     const uniqueRanks = Array.from(new Set(cards.map((card) => card.rank))).sort((a, b) =>
       this.compareRanks(b, a)
     )
-
+  
     if (uniqueRanks.includes(Rank.Ace)) {
-      uniqueRanks.push(Rank.Ace) // Add Ace to the end for low straight
+      uniqueRanks.push(Rank.Ace)
     }
-
+  
     for (let i = 0; i <= uniqueRanks.length - 5; i++) {
       const straight = uniqueRanks.slice(i, i + 5)
       if (this.isConsecutive(straight)) {
-        return cards
-          .filter((card) => straight.includes(card.rank))
+        const straightCards = cards.filter((card) => straight.includes(card.rank))
           .sort((a, b) => this.compareRanks(b.rank, a.rank))
-          .slice(0, 5)
+        const result: Card[] = []
+        for (const rank of straight) {
+          const card = straightCards.find(c => c.rank === rank)
+          if (card) result.push(card)
+        }
+        
+        return result
       }
     }
     return []

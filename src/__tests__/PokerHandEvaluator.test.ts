@@ -296,4 +296,127 @@ describe('PokerHandEvaluator.evaluateWinner', () => {
     expect(result.length).toBe(5)
     expect(result).toEqual(hand)
   })
+
+  test('correctly selects best five cards for straight hands', () => {
+    const players = [
+      createHand('player1', [
+        createCard(Rank.Six, Suit.Hearts),
+        createCard(Rank.Seven, Suit.Spades),
+        createCard(Rank.Eight, Suit.Diamonds),
+        createCard(Rank.Nine, Suit.Clubs),
+        createCard(Rank.Ten, Suit.Hearts),
+        createCard(Rank.Jack, Suit.Spades),
+        createCard(Rank.Queen, Suit.Diamonds)
+      ]),
+      createHand('player2', [
+        createCard(Rank.Two, Suit.Hearts),
+        createCard(Rank.Three, Suit.Spades),
+        createCard(Rank.Four, Suit.Diamonds),
+        createCard(Rank.Five, Suit.Clubs),
+        createCard(Rank.Six, Suit.Hearts),
+        createCard(Rank.King, Suit.Spades),
+        createCard(Rank.Ace, Suit.Diamonds)
+      ])
+    ];
+  
+    const result = PokerHandEvaluator.evaluateWinner(players);
+  
+    expect(result.handName).toBe('Straight');
+    expect(result.winners.length).toBe(1);
+    expect(result.winners[0].id).toBe('player1');
+    expect(result.hands.length).toBe(2);
+    
+    // Check winner's hand
+    expect(result.hands[0].cards.length).toBe(5);
+    expect(result.hands[0].cards.map(card => card.rank)).toEqual(
+      expect.arrayContaining([Rank.Eight, Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen])
+    );
+    
+    // Check loser's hand
+    expect(result.hands[1].cards.length).toBe(5);
+    expect(result.hands[1].cards.map(card => card.rank)).toEqual(
+      expect.arrayContaining([Rank.Two, Rank.Three, Rank.Four, Rank.Five, Rank.Six])
+    );
+  });
+  test('correctly selects hands for all players when winner has a flush', () => {
+    const players = [
+      createHand('player1', [
+        createCard(Rank.Two, Suit.Hearts),
+        createCard(Rank.Five, Suit.Hearts),
+        createCard(Rank.Eight, Suit.Hearts),
+        createCard(Rank.Jack, Suit.Hearts),
+        createCard(Rank.King, Suit.Hearts),
+        createCard(Rank.Seven, Suit.Spades),
+        createCard(Rank.Queen, Suit.Diamonds)
+      ]),
+      createHand('player2', [
+        createCard(Rank.Two, Suit.Clubs),
+        createCard(Rank.Three, Suit.Clubs),
+        createCard(Rank.Jack, Suit.Diamonds),
+        createCard(Rank.Queen, Suit.Spades),
+        createCard(Rank.King, Suit.Clubs),
+        createCard(Rank.Ace, Suit.Hearts)
+      ])
+    ];
+
+    const result = PokerHandEvaluator.evaluateWinner(players);
+
+    expect(result.handName).toBe('Flush');
+    expect(result.winners.length).toBe(1);
+    expect(result.winners[0].id).toBe('player1');
+    expect(result.hands.length).toBe(2);
+    
+    // Check winner's hand (player1)
+    expect(result.hands[0].id).toBe('player1');
+    expect(result.hands[0].cards.length).toBe(5);
+    expect(result.hands[0].cards.every(card => card.suit === Suit.Hearts)).toBe(true);
+    
+    // Check loser's hand (player2)
+    expect(result.hands[1].id).toBe('player2');
+    expect(result.hands[1].cards.length).toBe(5);
+    // Expect the best 5 cards from player2's hand
+    expect(result.hands[1].cards.map(card => card.rank)).toContain(Rank.Ace);
+    expect(result.hands[1].cards.map(card => card.rank)).toContain(Rank.King);
+  });
+
+  test('correctly selects hands for all players when winner has a straight', () => {
+    const players = [
+      createHand('player1', [
+        createCard(Rank.Six, Suit.Hearts),
+        createCard(Rank.Seven, Suit.Spades),
+        createCard(Rank.Eight, Suit.Diamonds),
+        createCard(Rank.Nine, Suit.Clubs),
+        createCard(Rank.Ten, Suit.Hearts),
+        createCard(Rank.Two, Suit.Spades),
+        createCard(Rank.Three, Suit.Diamonds)
+      ]),
+      createHand('player2', [
+        createCard(Rank.Two, Suit.Clubs),
+        createCard(Rank.Three, Suit.Hearts),
+        createCard(Rank.Four, Suit.Diamonds),
+        createCard(Rank.Jack, Suit.Clubs),
+        createCard(Rank.Queen, Suit.Spades),
+        createCard(Rank.King, Suit.Hearts)
+      ])
+    ];
+
+    const result = PokerHandEvaluator.evaluateWinner(players);
+
+    expect(result.handName).toBe('Straight');
+    expect(result.winners.length).toBe(1);
+    expect(result.winners[0].id).toBe('player1');
+    expect(result.hands.length).toBe(2);
+    
+    // Check winner's hand (player1)
+    expect(result.hands[0].id).toBe('player1');
+    expect(result.hands[0].cards.length).toBe(5);
+    expect(result.hands[0].cards.map(card => card.rank)).toEqual(expect.arrayContaining([Rank.Six, Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten]));
+    
+    // Check loser's hand (player2)
+    expect(result.hands[1].id).toBe('player2');
+    expect(result.hands[1].cards.length).toBe(5);
+    // Expect the best 5 cards from player2's hand
+    expect(result.hands[1].cards.map(card => card.rank)).toContain(Rank.King);
+    expect(result.hands[1].cards.map(card => card.rank)).toContain(Rank.Queen);
+  });
 })

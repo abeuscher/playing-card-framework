@@ -147,11 +147,11 @@ const gameSlice = createSlice({
       const stateCopy = JSON.parse(JSON.stringify(state))
       console.log(stateCopy)
       state.outcome = PokerHandEvaluator.evaluateWinner(state.playerHands)
-      state.outcome.hands.map((hand) => {
-        hand.forEach((card: any) => {
+      state.outcome.hands.forEach((hand) => {
+        hand.cards.forEach((card: any) => {
           if (state.playerHands) {
-            state.playerHands.map((playerHand, handIdx) => {
-              playerHand.cards.map((playerCard, cardIdx) => {
+            state.playerHands.forEach((playerHand, handIdx) => {
+              playerHand.cards.forEach((playerCard, cardIdx) => {
                 if (playerCard.id === card.id) {
                   state.playerHands[handIdx].cards[cardIdx].isSelected = true
                 }
