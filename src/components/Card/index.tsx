@@ -1,18 +1,29 @@
-// components/Card.tsx
+// Updated Card.tsx
 
 import { CardClassMap, Card as CardType } from '@/types'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Image from 'next/image'
+import { RootState } from '@/store'
 import styles from './Card.module.scss'
+import { toggleCardSelection } from '@/store/gameSlice'
 import { useDrag } from 'react-dnd'
 
 interface CardProps {
   card: CardType
   onCardDrag: (cardId: string) => void
   draggable?: boolean
+  stackId: string
 }
 
-const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
+const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable, stackId }) => {
+  const dispatch = useDispatch()
+  const playerHand = useSelector((state: RootState) =>
+    state.game.playerHands.find((hand) => hand.id === stackId)
+  )
+
+  const isSelected = playerHand?.cards.find((c) => c.id === card.id)?.isSelected || false
+
   const [{ isDragging }, dragRef] = useDrag(() => ({
     type: 'CARD',
     item: () => {
@@ -30,33 +41,25 @@ const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
     const rankClass = styles[`card-${CardClassMap[card.rank]}`]
     const faceClass = card.faceUp ? '' : styles['card-facedown']
     const hoverClass = isDragging ? styles['card-hover'] : styles['card-nohover']
-    return `${styles.card} ${suitClass} ${rankClass} ${faceClass} ${hoverClass}`
+    const selectedClass = isSelected ? styles['selected-card'] : ''
+    return `${styles.card} ${suitClass} ${rankClass} ${faceClass} ${hoverClass} ${selectedClass}`
   }
-  const wrapperClass = isDragging ? styles['card-wrapper-dragging'] : styles['card-wrapper']
+
+  const handleCardClick = () => {
+    if (card.isSelectable) {
+      dispatch(toggleCardSelection({ stackId, cardId: card.id }))
+    }
+  }
+
+  const wrapperClass = isDragging
+    ? `${styles['card-wrapper-dragging']} playing-card`
+    : `${styles['card-wrapper']} playing-card`
+
   const CardComponent = () => (
-    <div className={getCardClass(card)}>
+    <div className={getCardClass(card)} onClick={handleCardClick}>
       <span></span>
     </div>
   )
-  const ImageComponent = () =>
-    card.faceUp ? (
-      <Image
-        className={getCardClass(card)}
-        src={`/images/svg/${CardClassMap[card.rank]}${card.suit.charAt(0).toLowerCase()}.svg`}
-        alt={`${CardClassMap[card.rank]} of ${card.suit.charAt(0).toLowerCase()}`}
-        title={`${CardClassMap[card.rank]} of ${card.suit.charAt(0).toLowerCase()}`}
-        width={100}
-        height={150}
-      />
-    ) : (
-      <Image
-        className={getCardClass(card)}
-        src={`/images/svg/b.svg`}
-        alt="Card Back"
-        width={100}
-        height={150}
-      />
-    )
 
   return draggable ? (
     dragRef(
@@ -69,6 +72,7 @@ const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
             title={`${card.rank} of ${card.suit}`}
             width={100}
             height={150}
+            onClick={handleCardClick}
           />
         ) : (
           <Image
@@ -77,12 +81,13 @@ const Card: React.FC<CardProps> = ({ card, onCardDrag, draggable }) => {
             alt="Card Back"
             width={100}
             height={150}
+            onClick={handleCardClick}
           />
         )}
       </div>
     )
   ) : (
-    <div>
+    <div className="playing-card" onClick={handleCardClick}>
       {card.faceUp ? (
         <Image
           className={getCardClass(card)}

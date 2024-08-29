@@ -30,7 +30,10 @@ export class CardDeck {
             suit,
             rank,
             faceUp: true,
-            deckId: id
+            deckId: id,
+            isSelectable: true,
+            isSelected: false,
+            isDraggable: true
           });
         }
       }

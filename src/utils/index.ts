@@ -1,11 +1,10 @@
-import { Card, CardSlot, GameBoard, Rank, Suit } from '@/types'
+import { Card, CardSlot, GameBoard, Rank } from '@/types'
 
 import {CardDeck} from '../types/deck'
 import { v4 as uuidv4 } from 'uuid'
 
 export class CardGameLibrary {
-  private static suitOrder = Object.keys(Suit)
-  private static rankOrder = Object.keys(Rank)
+
   public static dealCardsToSlots(deck: CardDeck, slots: CardSlot[]): void {
     for (const slot of slots) {
       for (const stack of slot.stacks) {
@@ -14,6 +13,8 @@ export class CardGameLibrary {
             const thisCard = deck.drawCard()
             if (thisCard) {
               thisCard.faceUp = stack.layout?.faceUp || false
+              thisCard.isSelectable = stack.layout?.selectable || false
+              thisCard.isDraggable = stack.layout?.draggable || false
               stack.cards.push(thisCard)
             }
           }

@@ -1,5 +1,5 @@
-import { GameBoard, GameState, Outcome } from '@/types'
-import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { CardStack, GameBoard, GameState, Outcome } from '@/types'
+import { GetState, PayloadAction, createSlice } from '@reduxjs/toolkit'
 
 import { CardGameLibrary } from '@/utils'
 import PokerHandEvaluator from '@/utils/pokerhandevaluator'
@@ -9,6 +9,7 @@ const initialState: GameState = {
     id: 'board-1',
     slots: []
   },
+  playerHands: [],
   history: [],
   currentTurn: 0,
   selectedCardId: null,
@@ -77,6 +78,13 @@ const gameSlice = createSlice({
   reducers: {
     initializeGame: (state, action: PayloadAction<{ board: any }>) => {
       state.board = CardGameLibrary.initializeGameBoard(action.payload.board)
+      for (const slot of state.board.slots) {
+        for (const stack of slot.stacks) {
+          if (stack.isHand) {
+            state.playerHands.push(stack)
+          }
+        }
+      }
     },
     moveCard: (state, action: PayloadAction<{ destinationId: string }>) => {
       state.destinationStackId = action.payload.destinationId
@@ -110,12 +118,28 @@ const gameSlice = createSlice({
       state.selectedCardId = action.payload.cardId
     },
     findPokerWinner: (state) => {
-      const playerHand = {"player":"player", "hand":state.board.slots[2].stacks[0].cards }
-      const opponentHand = {"player":"opponent", "hand":state.board.slots[0].stacks[0].cards }
-      state.outcome = PokerHandEvaluator.evaluateWinner([playerHand, opponentHand])
+      state.outcome = PokerHandEvaluator.evaluateWinner(
+        state.playerHands
+      );
+      const stateCopy = JSON.parse(JSON.stringify(state));
+      console.log('Finding winner', stateCopy);
+      state.outcome.hands.map((hand) => {
+        hand.cards.forEach((card: any) => {
+          toggleCardSelection({ stackId: hand.id, cardId: card.id });
+          const cardCopy = JSON.parse(JSON.stringify(card));
+          //console.log('Toggling card selection', cardCopy);
+        })
+      });
+    },
+    toggleCardSelection: (state, action: PayloadAction<{ stackId: string; cardId: string }>) => {
+      const playerHand = state.playerHands.find((hand) => hand.id === action.payload.stackId)
+      const card = playerHand?.cards.find((c) => c.id === action.payload.cardId)
+      if (card) {
+        card.isSelected = !card.isSelected
+      }
     }
   }
 })
 
-export const { initializeGame, moveCard, dragCard, findPokerWinner } = gameSlice.actions
+export const { initializeGame, moveCard, dragCard, findPokerWinner, toggleCardSelection } = gameSlice.actions
 export default gameSlice.reducer

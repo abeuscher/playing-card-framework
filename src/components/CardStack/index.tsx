@@ -36,9 +36,16 @@ const CardStack: React.FC<CardStackProps> = ({ stack, onCardDrag, onCardDrop }) 
       className={`${styles.cardStack} ${styles[`cardstack-${stack.layout?.arrangement?.toLowerCase()}`] ?? ''} ${isOver && canDrop ? styles.highlight : ''}`}
     >
       {stack.cards.map((card) => (
-        <Card key={card.id} card={card} onCardDrag={onCardDrag} draggable={true} />
+        <Card key={card.id} card={card} onCardDrag={onCardDrag} stackId={stack.id} />
       ))}
-      <p className="stack-label">{stack.rules.join(', ')}</p>
+      {stack.rules && stack.rules.length > 0 && stack.cards.length === 0 && (
+        <div className={`${styles['stack-label']}`}>
+          <p>
+            <strong>RULES</strong>
+          </p>
+          <p>{stack.rules.join(', ')}</p>
+        </div>
+      )}
     </div>
   )
 }

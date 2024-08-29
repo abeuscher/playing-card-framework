@@ -28,6 +28,9 @@ export interface Card {
   rank: Rank
   faceUp: boolean
   deckId: string
+  isSelectable: boolean
+  isSelected: boolean
+  isDraggable: boolean
 }
 
 export const CardClassMap = {
@@ -52,6 +55,8 @@ export interface CardStackLayout {
   arrangement: 'stacked' | 'spread' | 'fan' 
   direction: 'left' | 'right' | 'up' | 'down'
   faceUp: boolean
+  selectable: boolean
+  draggable: boolean
 }
 
 // Interface for a card stack
@@ -61,6 +66,7 @@ export interface CardStack {
   initialCards?: number
   order: 'ascending' | 'descending'
   rules: string[]
+  isHand: boolean
   layout?: CardStackLayout
 }
 
@@ -77,28 +83,25 @@ export interface GameBoard {
   slots: CardSlot[]
 }
 
-// Interface for the game state
 export interface GameState {
-  board: GameBoard
-  history: GameBoard[]
-  currentTurn: number
-  selectedCardId: string | null
-  destinationStackId: string | null
-  outcome: Outcome | null
-  message: MessageBox | null
+  board: GameBoard;
+  playerHands: CardStack[];
+  history: any[]; // Assuming this is defined elsewhere
+  currentTurn: number;
+  selectedCardId: string | null;
+  destinationStackId: string | null;
+  outcome: Outcome; // Assuming Outcome is defined elsewhere
+  message: string | null;
 }
 
-export interface Outcome {
-  winner: string;
+
+export type Outcome = {
+  winners: Array<CardStack>;
+  losers: Array<CardStack>;
   handName: string;
   handRank: number;
-  isTie: boolean;
-}
-
-export interface PlayerHand {
-  player: string;
-  hand: Card[];
-}
+  hands: Array<any>;
+};
 
 export interface MessageBox {
   message: string;

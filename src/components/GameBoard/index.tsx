@@ -28,12 +28,15 @@ const GameBoard = () => {
       initGame()
     }
   }, [dispatch])
+
   const outcome = useSelector((state: RootState) => state.game.outcome)
   useEffect(() => {
     dispatch(
       setMessageWithExpiration({
-        message: outcome?.winner
-          ? `Winner: ${outcome.winner} with ${outcome.handName}`
+        message: outcome?.winners
+          ? `Winner: ${outcome.winners.map((w) => {
+              return w.id
+            })} with ${outcome.handName}`
           : 'Game started',
         type: 'info',
         duration: 10000 // 15 seconds

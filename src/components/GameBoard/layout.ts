@@ -10,16 +10,19 @@ export const BasicLayout: GameBoard = {
       stacks: [
         {
           id: 'opponent-hand',
+          isHand: true,
           cards: new Array(),
           initialCards: 7,
           order: 'ascending',
-          rules: [],
+          rules: ['BLOCK'],
           layout: {
             name: 'Hand',
             description: 'Left to right',
             arrangement: 'spread',
             direction: 'right',
-            faceUp: true
+            faceUp: true,
+            selectable: false,
+            draggable: false
           }
         }
       ]
@@ -29,30 +32,36 @@ export const BasicLayout: GameBoard = {
       stacks: [
         {
           id: 'draw-pile',
+          isHand: false,
           cards: new Array(),
-          initialCards: 38,
+          initialCards: 29,
           order: 'ascending',
-          rules: [],
+          rules: ['BLOCK'],
           layout: {
             name: 'Stack',
             description: 'Draw Pile',
             arrangement: 'stacked',
             direction: 'down',
-            faceUp: false
+            faceUp: false,
+            selectable: false,
+            draggable: false
           },
         },
         {
           id: 'discard-pile',
+          isHand: false,
           cards: new Array(),
           initialCards: 0,
           order: 'ascending',
-          rules: [],
+          rules: ['BLOCK'],
           layout: {
             name: 'Stack',
             description: 'stack',
             arrangement: 'stacked',
             direction: 'up',
-            faceUp: true
+            faceUp: true,
+            selectable: false,
+            draggable: false
           },
         }
       ]
@@ -63,16 +72,19 @@ export const BasicLayout: GameBoard = {
       stacks: [
         {
           id: 'player-hand',
+          isHand: true,
           cards: new Array(),
           initialCards: 7,
           order: 'ascending',
-          rules: [],
+          rules: ['BLOCK'],
           layout: {
             name: 'Hand',
             description: 'Left to right',
             arrangement: 'spread',
             direction: 'right',
-            faceUp: true
+            faceUp: true,
+            selectable: true,
+            draggable: true
           },
         }
       ]
