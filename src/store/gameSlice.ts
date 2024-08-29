@@ -121,13 +121,14 @@ const gameSlice = createSlice({
       state.outcome = PokerHandEvaluator.evaluateWinner(
         state.playerHands
       );
-      const stateCopy = JSON.parse(JSON.stringify(state));
-      console.log('Finding winner', stateCopy);
       state.outcome.hands.map((hand) => {
         hand.cards.forEach((card: any) => {
-          toggleCardSelection({ stackId: hand.id, cardId: card.id });
-          const cardCopy = JSON.parse(JSON.stringify(card));
-          //console.log('Toggling card selection', cardCopy);
+          const playerHand = state.playerHands.find((h) => h.id === hand.id)
+          const cardInHand = playerHand?.cards.find((c) => c.id === card.id)
+          if (cardInHand) {
+            cardInHand.isSelected = true
+          }
+          
         })
       });
     },

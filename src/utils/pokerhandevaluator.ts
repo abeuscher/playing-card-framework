@@ -1,7 +1,5 @@
 import { Card, CardStack, Outcome, Rank, Suit } from '@/types/'
 
-import { toggleCardSelection } from '@/store/gameSlice'
-
 /**
  * Class for evaluating poker hands and determining winners.
  */
@@ -122,7 +120,6 @@ export default class PokerHandEvaluator {
     const rankCounts = this.countRanks(cards)
     return Array.from(rankCounts.values()).includes(3)
   }
-
   /**
    * Checks if the hand contains two pairs.
    * @param cards An array of Card objects.
@@ -130,7 +127,7 @@ export default class PokerHandEvaluator {
    */
   private static isTwoPair(cards: Card[]): boolean {
     const rankCounts = this.countRanks(cards)
-    return Array.from(rankCounts.values()).filter((count) => count === 2).length === 2
+    return Array.from(rankCounts.values()).filter((count) => count === 2).length >= 2
   }
 
   /**
@@ -140,16 +137,17 @@ export default class PokerHandEvaluator {
    */
   private static isOnePair(cards: Card[]): boolean {
     const rankCounts = this.countRanks(cards)
-    return Array.from(rankCounts.values()).includes(2) && rankCounts.size === cards.length - 1
+    return Array.from(rankCounts.values()).filter((count) => count === 2).length === 1
   }
 
   /**
    * Checks if the hand is a high card hand.
    * @param cards An array of Card objects.
-   * @returns Always returns true as all hands that don't match other categories are high card hands.
+   * @returns True if the hand doesn't contain any pairs or better, false otherwise.
    */
   private static isHighCard(cards: Card[]): boolean {
-    return true
+    const rankCounts = this.countRanks(cards)
+    return Array.from(rankCounts.values()).every((count) => count === 1)
   }
 
   /**
@@ -195,27 +193,27 @@ export default class PokerHandEvaluator {
   private static compareEqualHands(hand1: Card[], hand2: Card[], handType: string): number {
     switch (handType) {
       case 'Royal Flush':
-        return this.compareRoyalFlush(hand1, hand2);
+        return this.compareRoyalFlush(hand1, hand2)
       case 'Straight Flush':
-        return this.compareStraightFlush(hand1, hand2);
+        return this.compareStraightFlush(hand1, hand2)
       case 'Four of a Kind':
-        return this.compareFourOfAKind(hand1, hand2);
+        return this.compareFourOfAKind(hand1, hand2)
       case 'Full House':
-        return this.compareFullHouse(hand1, hand2);
+        return this.compareFullHouse(hand1, hand2)
       case 'Flush':
-        return this.compareFlush(hand1, hand2);
+        return this.compareFlush(hand1, hand2)
       case 'Straight':
-        return this.compareStraight(hand1, hand2);
+        return this.compareStraight(hand1, hand2)
       case 'Three of a Kind':
-        return this.compareThreeOfAKind(hand1, hand2);
+        return this.compareThreeOfAKind(hand1, hand2)
       case 'Two Pair':
-        return this.compareTwoPair(hand1, hand2);
+        return this.compareTwoPair(hand1, hand2)
       case 'One Pair':
-        return this.compareOnePair(hand1, hand2);
+        return this.compareOnePair(hand1, hand2)
       case 'High Card':
-        return this.compareHighCard(hand1, hand2);
+        return this.compareHighCard(hand1, hand2)
       default:
-        throw new Error(`Unknown hand type: ${handType}`);
+        throw new Error(`Unknown hand type: ${handType}`)
     }
   }
 
@@ -233,8 +231,8 @@ export default class PokerHandEvaluator {
   }
 
   private static compareRanks(rank1: Rank, rank2: Rank): number {
-    const rankOrder = [...Object.values(Rank)]; // Ace high
-    rankOrder.push(rankOrder.shift() as Rank);
+    const rankOrder = [...Object.values(Rank)] // Ace high
+    rankOrder.push(rankOrder.shift() as Rank)
     const index1 = rankOrder.indexOf(rank1)
     const index2 = rankOrder.indexOf(rank2)
     if (index1 > index2) return 1
@@ -262,276 +260,311 @@ export default class PokerHandEvaluator {
    * @returns An object containing the winners, losers, hand name, and hand rank.
    * @throws Error if no players are provided.
    */
-  public static evaluateWinner(
-    players: Array<CardStack>
-  ): Outcome {
+  public static evaluateWinner(players: Array<CardStack>): Outcome {
     if (players.length === 0) {
-      throw new Error('At least one player is required');
+      throw new Error('At least one player is required')
     }
-  
-    let winners: Array<CardStack> = [players[0]];
-    let losers: Array<CardStack> = [];
-    let winningHand = this.evaluateHand(players[0].cards);
-  
+
+    let winners: Array<CardStack> = [players[0]]
+    let losers: Array<CardStack> = []
+    let winningHand = this.evaluateHand(players[0].cards)
+
     for (let i = 1; i < players.length; i++) {
-      const currentPlayer = players[i];
-      const currentHand = this.evaluateHand(currentPlayer.cards);
-  
+      const currentPlayer = players[i]
+      const currentHand = this.evaluateHand(currentPlayer.cards)
+
       if (currentHand.rank > winningHand.rank) {
-        losers = losers.concat(winners);
-        winners = [currentPlayer];
-        winningHand = currentHand;
+        losers = losers.concat(winners)
+        winners = [currentPlayer]
+        winningHand = currentHand
       } else if (currentHand.rank === winningHand.rank) {
         const comparison = this.compareEqualHands(
           winners[0].cards,
           currentPlayer.cards,
           winningHand.name
-        );
+        )
         if (comparison < 0) {
-          losers = losers.concat(winners);
-          winners = [currentPlayer];
+          losers = losers.concat(winners)
+          winners = [currentPlayer]
         } else if (comparison === 0) {
-          winners.push(currentPlayer);
+          winners.push(currentPlayer)
         } else {
-          losers.push(currentPlayer);
+          losers.push(currentPlayer)
         }
       } else {
-        losers.push(currentPlayer);
+        losers.push(currentPlayer)
       }
     }
-    const selectHands = winners.map(winner => {
-      return {
-        id: winner.id,
-        cards: this.getBestFiveCardHand(winner.cards, winningHand.name)
-      }
-    }).concat(losers.map(loser => {
-      return {
-        id: loser.id,
-        cards: this.getBestFiveCardHand(loser.cards, winningHand.name)
-      }
-    }))
-  
+    const selectHands = winners
+      .map((winner) => {
+        return {
+          id: winner.id,
+          cards: this.getBestFiveCardHand(winner.cards, winningHand.name)
+        }
+      })
+      .concat(
+        losers.map((loser) => {
+          return {
+            id: loser.id,
+            cards: this.getBestFiveCardHand(loser.cards, winningHand.name)
+          }
+        })
+      )
+
     return {
       winners: winners,
       losers: losers,
       handName: winningHand.name,
       handRank: winningHand.rank,
       hands: selectHands
-    };
+    }
   }
-  
+
   private static getBestFiveCardHand(cards: Card[], handType: string): Card[] {
     switch (handType) {
       case 'Royal Flush':
       case 'Straight Flush':
-        return this.getBestStraightFlush(cards);
+        return this.getBestStraightFlush(cards)
       case 'Four of a Kind':
-        return this.getBestFourOfAKind(cards);
+        return this.getBestFourOfAKind(cards)
       case 'Full House':
-        return this.getBestFullHouse(cards);
+        return this.getBestFullHouse(cards)
       case 'Flush':
-        return this.getBestFlush(cards);
+        return this.getBestFlush(cards)
       case 'Straight':
-        return this.getBestStraight(cards);
+        return this.getBestStraight(cards)
       case 'Three of a Kind':
-        return this.getBestThreeOfAKind(cards);
+        return this.getBestThreeOfAKind(cards)
       case 'Two Pair':
-        return this.getBestTwoPair(cards);
+        return this.getBestTwoPair(cards)
       case 'One Pair':
-        return this.getBestOnePair(cards);
+        return this.getBestOnePair(cards)
       case 'High Card':
-        return this.getHighCards(cards, 5);
+        return this.getHighCards(cards, 5)
       default:
-        throw new Error(`Unknown hand type: ${handType}`);
+        throw new Error(`Unknown hand type: ${handType}`)
     }
   }
-  
+
   private static getBestStraightFlush(cards: Card[]): Card[] {
-    const flushSuit = this.getFlushSuit(cards);
-    if (!flushSuit) return [];
-    const flushCards = cards.filter(card => card.suit === flushSuit).sort((a, b) => this.compareRanks(b.rank, a.rank));
-    return this.getBestStraight(flushCards).slice(0, 5);
-  }
-  
-  private static getBestFourOfAKind(cards: Card[]): Card[] {
-    const quads = this.findNOfAKind(cards, 4);
-    const kicker = this.getHighCards(cards.filter(card => card.rank !== quads[0].rank), 1)[0];
-    return [...quads, kicker];
-  }
-  
-  private static getBestFullHouse(cards: Card[]): Card[] {
-    const trips = this.findNOfAKind(cards, 3);
-    const pairs = this.findNOfAKind(cards.filter(card => card.rank !== trips[0].rank), 2);
-    return [...trips, ...pairs.slice(0, 2)];
-  }
-  
-  private static getBestFlush(cards: Card[]): Card[] {
-    const flushSuit = this.getFlushSuit(cards);
-    if (!flushSuit) return [];
-    return cards.filter(card => card.suit === flushSuit)
+    const flushSuit = this.getFlushSuit(cards)
+    if (!flushSuit) return []
+    const flushCards = cards
+      .filter((card) => card.suit === flushSuit)
       .sort((a, b) => this.compareRanks(b.rank, a.rank))
-      .slice(0, 5);
+    return this.getBestStraight(flushCards).slice(0, 5)
   }
-  
+
+  private static getBestFourOfAKind(cards: Card[]): Card[] {
+    const quads = this.findNOfAKind(cards, 4)
+    const kicker = this.getHighCards(
+      cards.filter((card) => card.rank !== quads[0].rank),
+      1
+    )[0]
+    return [...quads, kicker]
+  }
+
+  private static getBestFullHouse(cards: Card[]): Card[] {
+    const trips = this.findNOfAKind(cards, 3)
+    const pairs = this.findNOfAKind(
+      cards.filter((card) => card.rank !== trips[0].rank),
+      2
+    )
+    return [...trips, ...pairs.slice(0, 2)]
+  }
+
+  private static getBestFlush(cards: Card[]): Card[] {
+    const flushSuit = this.getFlushSuit(cards)
+    if (!flushSuit) return []
+    return cards
+      .filter((card) => card.suit === flushSuit)
+      .sort((a, b) => this.compareRanks(b.rank, a.rank))
+      .slice(0, 5)
+  }
+
   private static getBestStraight(cards: Card[]): Card[] {
-    const uniqueRanks = Array.from(new Set(cards.map(card => card.rank)))
-      .sort((a, b) => this.compareRanks(b, a));
-    
+    const uniqueRanks = Array.from(new Set(cards.map((card) => card.rank))).sort((a, b) =>
+      this.compareRanks(b, a)
+    )
+
     if (uniqueRanks.includes(Rank.Ace)) {
-      uniqueRanks.push(Rank.Ace); // Add Ace to the end for low straight
+      uniqueRanks.push(Rank.Ace) // Add Ace to the end for low straight
     }
-  
+
     for (let i = 0; i <= uniqueRanks.length - 5; i++) {
-      const straight = uniqueRanks.slice(i, i + 5);
+      const straight = uniqueRanks.slice(i, i + 5)
       if (this.isConsecutive(straight)) {
-        return cards.filter(card => straight.includes(card.rank))
+        return cards
+          .filter((card) => straight.includes(card.rank))
           .sort((a, b) => this.compareRanks(b.rank, a.rank))
-          .slice(0, 5);
+          .slice(0, 5)
       }
     }
-    return [];
+    return []
   }
-  
+
   private static getBestThreeOfAKind(cards: Card[]): Card[] {
-    const trips = this.findNOfAKind(cards, 3);
+    const trips = this.findNOfAKind(cards, 3)
     if (trips.length === 0) {
+      return this.getHighCards(cards, 5)
+    }
+    const kickers = this.getHighCards(
+      cards.filter((card) => card.rank !== trips[0].rank),
+      2
+    )
+    return [...trips, ...kickers]
+  }
+
+  private static getBestTwoPair(cards: Card[]): Card[] {
+    const pairs = this.findNOfAKind(cards, 2).sort((a, b) => this.compareRanks(b.rank, a.rank));
+    
+    if (pairs.length < 2) {
       return this.getHighCards(cards, 5);
     }
-    const kickers = this.getHighCards(cards.filter(card => card.rank !== trips[0].rank), 2);
-    return [...trips, ...kickers];
-  }
+    
+    const bestPairs = pairs.slice(0, 2).flat();
+    const kickers = this.getHighCards(
+      cards.filter(card => !bestPairs.some(pairCard => pairCard.rank === card.rank)),
+      5 - bestPairs.length
+    );
   
-  private static getBestTwoPair(cards: Card[]): Card[] {
-    const pairs = this.findNOfAKind(cards, 2);
-    const kicker = this.getHighCards(cards.filter(card => !pairs.flat().some(p => p.rank === card.rank)), 1)[0];
-    return [...pairs, ...pairs, kicker];
+    return [...bestPairs, ...kickers].slice(0, 5);
   }
   
   private static getBestOnePair(cards: Card[]): Card[] {
-    const pair = this.findNOfAKind(cards, 2);
-    if (pair.length === 0) return this.getHighCards(cards, 5);
-    const kickers = this.getHighCards(cards.filter(card => card.rank !== pair[0].rank), 3);
-    return [...pair, ...kickers];
+    const pair = this.findNOfAKind(cards, 2)
+    if (pair.length === 0) return this.getHighCards(cards, 5)
+    const kickers = this.getHighCards(
+      cards.filter((card) => card.rank !== pair[0].rank),
+      3
+    )
+    return [...pair, ...kickers]
   }
-  
+
   private static getFlushSuit(cards: Card[]): Suit | null {
     const suitCounts = cards.reduce((counts, card) => {
-      counts.set(card.suit, (counts.get(card.suit) || 0) + 1);
-      return counts;
-    }, new Map<Suit, number>());
-    const entries = Array.from(suitCounts.entries());
+      counts.set(card.suit, (counts.get(card.suit) || 0) + 1)
+      return counts
+    }, new Map<Suit, number>())
+    const entries = Array.from(suitCounts.entries())
     for (const [suit, count] of entries) {
-      if (count >= 5) return suit;
+      if (count >= 5) return suit
     }
-    return null;
+    return null
   }
-  
+
   private static isConsecutive(ranks: Rank[]): boolean {
-    const rankOrder = [...Object.values(Rank)];
-    rankOrder.push(rankOrder.shift() as Rank); // Move Ace to the end
-    const indices = ranks.map(rank => rankOrder.indexOf(rank));
+    const rankOrder = [...Object.values(Rank)]
+    rankOrder.push(rankOrder.shift() as Rank) // Move Ace to the end
+    const indices = ranks.map((rank) => rankOrder.indexOf(rank))
     for (let i = 1; i < indices.length; i++) {
-      if (indices[i] !== indices[i-1] - 1) return false;
+      if (indices[i] !== indices[i - 1] - 1) return false
     }
-    return true;
+    return true
   }
-  
+
   private static getHighCards(cards: Card[], count: number): Card[] {
-    return cards.sort((a, b) => this.compareRanks(b.rank, a.rank)).slice(0, count);
+    return cards.sort((a, b) => this.compareRanks(b.rank, a.rank)).slice(0, count)
   }
   private static compareRoyalFlush(hand1: Card[], hand2: Card[]): number {
     // All royal flushes are equal
-    return 0;
+    return 0
   }
-  
+
   private static compareStraightFlush(hand1: Card[], hand2: Card[]): number {
     // Compare the highest card of each straight flush
-    return this.compareHighCards(hand1, hand2);
+    return this.compareHighCards(hand1, hand2)
   }
-  
+
   private static compareFourOfAKind(hand1: Card[], hand2: Card[]): number {
-    const quads1 = this.findNOfAKind(hand1, 4)[0];
-    const quads2 = this.findNOfAKind(hand2, 4)[0];
-    const quadsComparison = this.compareHighCards([quads1], [quads2]);
-    if (quadsComparison !== 0) return quadsComparison;
-    
+    const quads1 = this.findNOfAKind(hand1, 4)[0]
+    const quads2 = this.findNOfAKind(hand2, 4)[0]
+    const quadsComparison = this.compareHighCards([quads1], [quads2])
+    if (quadsComparison !== 0) return quadsComparison
+
     // If quads are equal, compare the kicker
-    const kicker1 = hand1.find(card => card.rank !== quads1.rank);
-    const kicker2 = hand2.find(card => card.rank !== quads2.rank);
-    return this.compareHighCards([kicker1!], [kicker2!]);
+    const kicker1 = hand1.find((card) => card.rank !== quads1.rank)
+    const kicker2 = hand2.find((card) => card.rank !== quads2.rank)
+    return this.compareHighCards([kicker1!], [kicker2!])
   }
-  
+
   private static compareFullHouse(hand1: Card[], hand2: Card[]): number {
-    const [trips1] = this.findNOfAKind(hand1, 3);
-    const [trips2] = this.findNOfAKind(hand2, 3);
-    const tripsComparison = this.compareHighCards([trips1], [trips2]);
-    if (tripsComparison !== 0) return tripsComparison;
-    
-    const [pair1] = this.findNOfAKind(hand1, 2);
-    const [pair2] = this.findNOfAKind(hand2, 2);
-    return this.compareHighCards([pair1], [pair2]);
+    const [trips1] = this.findNOfAKind(hand1, 3)
+    const [trips2] = this.findNOfAKind(hand2, 3)
+    const tripsComparison = this.compareHighCards([trips1], [trips2])
+    if (tripsComparison !== 0) return tripsComparison
+
+    const [pair1] = this.findNOfAKind(hand1, 2)
+    const [pair2] = this.findNOfAKind(hand2, 2)
+    return this.compareHighCards([pair1], [pair2])
   }
-  
+
   private static compareFlush(hand1: Card[], hand2: Card[]): number {
     // Compare each card from highest to lowest
     for (let i = 0; i < 5; i++) {
-      const comparison = this.compareHighCards([hand1[i]], [hand2[i]]);
-      if (comparison !== 0) return comparison;
+      const comparison = this.compareHighCards([hand1[i]], [hand2[i]])
+      if (comparison !== 0) return comparison
     }
-    return 0;
+    return 0
   }
-  
+
   private static compareStraight(hand1: Card[], hand2: Card[]): number {
     // Compare the highest card of each straight
-    return this.compareHighCards([hand1[0]], [hand2[0]]);
+    return this.compareHighCards([hand1[0]], [hand2[0]])
   }
-  
+
   private static compareThreeOfAKind(hand1: Card[], hand2: Card[]): number {
-    const trips1 = this.findNOfAKind(hand1, 3)[0];
-    const trips2 = this.findNOfAKind(hand2, 3)[0];
-    console.log("TRIPS1:",trips1, "TRIPS2:",trips2, "HAND1:",hand1, "HAND2:",hand2)
-    const tripsComparison = this.compareHighCards([trips1], [trips2]);
-    if (tripsComparison !== 0) return tripsComparison;
-    
+    const trips1 = this.findNOfAKind(hand1, 3)[0]
+    const trips2 = this.findNOfAKind(hand2, 3)[0]
+    const tripsComparison = this.compareHighCards([trips1], [trips2])
+    if (tripsComparison !== 0) return tripsComparison
+
     // If trips are equal, compare the two kickers
-    const kickers1 = hand1.filter(card => card.rank !== trips1.rank).sort((a, b) => this.compareRanks(b.rank, a.rank));
-    const kickers2 = hand2.filter(card => card.rank !== trips2.rank).sort((a, b) => this.compareRanks(b.rank, a.rank));
-    return this.compareHighCards(kickers1, kickers2);
+    const kickers1 = hand1
+      .filter((card) => card.rank !== trips1.rank)
+      .sort((a, b) => this.compareRanks(b.rank, a.rank))
+    const kickers2 = hand2
+      .filter((card) => card.rank !== trips2.rank)
+      .sort((a, b) => this.compareRanks(b.rank, a.rank))
+    return this.compareHighCards(kickers1, kickers2)
   }
-  
+
   private static compareTwoPair(hand1: Card[], hand2: Card[]): number {
-    const pairs1 = this.findNOfAKind(hand1, 2).sort((a, b) => this.compareRanks(b.rank, a.rank));
-    const pairs2 = this.findNOfAKind(hand2, 2).sort((a, b) => this.compareRanks(b.rank, a.rank));
-    
+    const pairs1 = this.findNOfAKind(hand1, 2).sort((a, b) => this.compareRanks(b.rank, a.rank))
+    const pairs2 = this.findNOfAKind(hand2, 2).sort((a, b) => this.compareRanks(b.rank, a.rank))
+
     // Compare higher pairs
-    const highPairComparison = this.compareHighCards([pairs1[0]], [pairs2[0]]);
-    if (highPairComparison !== 0) return highPairComparison;
-    
+    const highPairComparison = this.compareHighCards([pairs1[0]], [pairs2[0]])
+    if (highPairComparison !== 0) return highPairComparison
+
     // Compare lower pairs
-    const lowPairComparison = this.compareHighCards([pairs1[1]], [pairs2[1]]);
-    if (lowPairComparison !== 0) return lowPairComparison;
-    
+    const lowPairComparison = this.compareHighCards([pairs1[1]], [pairs2[1]])
+    if (lowPairComparison !== 0) return lowPairComparison
+
     // If both pairs are equal, compare the kicker
-    const kicker1 = hand1.find(card => !pairs1.some(pair => pair.rank === card.rank));
-    const kicker2 = hand2.find(card => !pairs2.some(pair => pair.rank === card.rank));
-    return this.compareHighCards([kicker1!], [kicker2!]);
+    const kicker1 = hand1.find((card) => !pairs1.some((pair) => pair.rank === card.rank))
+    const kicker2 = hand2.find((card) => !pairs2.some((pair) => pair.rank === card.rank))
+    return this.compareHighCards([kicker1!], [kicker2!])
   }
-  
+
   private static compareOnePair(hand1: Card[], hand2: Card[]): number {
-    const pair1 = this.findNOfAKind(hand1, 2)[0];
-    const pair2 = this.findNOfAKind(hand2, 2)[0];
-    const pairComparison = this.compareHighCards([pair1], [pair2]);
-    if (pairComparison !== 0) return pairComparison;
-    
+    const pair1 = this.findNOfAKind(hand1, 2)[0]
+    const pair2 = this.findNOfAKind(hand2, 2)[0]
+    const pairComparison = this.compareHighCards([pair1], [pair2])
+    if (pairComparison !== 0) return pairComparison
+
     // If pairs are equal, compare the three kickers
-    const kickers1 = hand1.filter(card => card.rank !== pair1.rank).sort((a, b) => this.compareRanks(b.rank, a.rank));
-    const kickers2 = hand2.filter(card => card.rank !== pair2.rank).sort((a, b) => this.compareRanks(b.rank, a.rank));
-    return this.compareHighCards(kickers1, kickers2);
+    const kickers1 = hand1
+      .filter((card) => card.rank !== pair1.rank)
+      .sort((a, b) => this.compareRanks(b.rank, a.rank))
+    const kickers2 = hand2
+      .filter((card) => card.rank !== pair2.rank)
+      .sort((a, b) => this.compareRanks(b.rank, a.rank))
+    return this.compareHighCards(kickers1, kickers2)
   }
-  
+
   private static compareHighCard(hand1: Card[], hand2: Card[]): number {
     // Compare each card from highest to lowest
-    return this.compareHighCards(hand1, hand2);
+    return this.compareHighCards(hand1, hand2)
   }
-  
 }
