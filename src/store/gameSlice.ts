@@ -33,7 +33,6 @@ const findCard = (board: GameBoard, cardId: string) => {
   }
 }
 
-
 const findStack = (board: GameBoard, stackId: string) => {
   const slot =
     board.slots.find((slot) => {
@@ -108,7 +107,10 @@ const gameSlice = createSlice({
         state.selectedCardId = ``
         return
       }
-      const splicedCard = state.board.slots[slotIndex].stacks[stackIndex].cards.splice(cardIndex, 1)[0]
+      const splicedCard = state.board.slots[slotIndex].stacks[stackIndex].cards.splice(
+        cardIndex,
+        1
+      )[0]
       const destinationStack = state.board.slots[destinationSlotIndex].stacks[destinationStackIndex]
       splicedCard.faceUp = destinationStack?.layout?.faceUp || false
       state.board.slots[destinationSlotIndex].stacks[destinationStackIndex].cards.push(splicedCard)
@@ -118,35 +120,46 @@ const gameSlice = createSlice({
     dragCard: (state, action: PayloadAction<{ cardId: string }>): void => {
       state.selectedCardId = action.payload.cardId
     },
-    dealCard: (state, action: PayloadAction<{ sourceStack: string, destinationStack: string, numCards: number }>): void => {
+    dealCard: (
+      state,
+      action: PayloadAction<{ sourceStack: string; destinationStack: string; numCards: number }>
+    ): void => {
       const { destinationStack, sourceStack, numCards } = action.payload
-      const { destinationSlotIndex, destinationStackIndex } = findStack(state.board, destinationStack)
+      const { destinationSlotIndex, destinationStackIndex } = findStack(
+        state.board,
+        destinationStack
+      )
       const { slotIndex, stackIndex, cardIndex } = findCard(state.board, sourceStack)
-      const splicedCards = state.board.slots[slotIndex].stacks[stackIndex].cards.splice(cardIndex, numCards)
-      const destinationStackObj = state.board.slots[destinationSlotIndex].stacks[destinationStackIndex]
+      const splicedCards = state.board.slots[slotIndex].stacks[stackIndex].cards.splice(
+        cardIndex,
+        numCards
+      )
+      const destinationStackObj =
+        state.board.slots[destinationSlotIndex].stacks[destinationStackIndex]
       splicedCards.map((card: any) => {
         card.faceUp = destinationStackObj?.layout?.faceUp || false
       })
-      state.board.slots[destinationSlotIndex].stacks[destinationStackIndex].cards.concat(splicedCards)
+      state.board.slots[destinationSlotIndex].stacks[destinationStackIndex].cards.concat(
+        splicedCards
+      )
     },
     findPokerWinner: (state) => {
-      state.outcome = PokerHandEvaluator.evaluateWinner(
-        state.playerHands
-      );
-      const handsCopy = JSON.parse(JSON.stringify(state.outcome.hands))
-      console.log(handsCopy)
+      const stateCopy = JSON.parse(JSON.stringify(state))
+      console.log(stateCopy)
+      state.outcome = PokerHandEvaluator.evaluateWinner(state.playerHands)
       state.outcome.hands.map((hand) => {
-        hand.cards.forEach((card: any) => {
-          const hands = state.playerHands.find((h) => h.isHand)
-          if (hands) {
-            hands.cards.map((playerCard) => {
-              if (playerCard.id === card.id) {
-                playerCard.isSelected = true
-              }
+        hand.forEach((card: any) => {
+          if (state.playerHands) {
+            state.playerHands.map((playerHand, handIdx) => {
+              playerHand.cards.map((playerCard, cardIdx) => {
+                if (playerCard.id === card.id) {
+                  state.playerHands[handIdx].cards[cardIdx].isSelected = true
+                }
+              })
             })
-          }       
+          }
         })
-      });
+      })
     },
     toggleCardSelection: (state, action: PayloadAction<{ stackId: string; cardId: string }>) => {
       const playerHand = state.playerHands.find((hand) => hand.id === action.payload.stackId)
@@ -158,5 +171,6 @@ const gameSlice = createSlice({
   }
 })
 
-export const { initializeGame, moveCard, dragCard, findPokerWinner, toggleCardSelection } = gameSlice.actions
+export const { initializeGame, moveCard, dragCard, findPokerWinner, toggleCardSelection } =
+  gameSlice.actions
 export default gameSlice.reducer

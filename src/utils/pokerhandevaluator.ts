@@ -297,17 +297,11 @@ export default class PokerHandEvaluator {
     }
     const selectHands = winners
       .map((winner) => {
-        return {
-          id: winner.id,
-          cards: this.getBestFiveCardHand(winner.cards, winningHand.name)
-        }
+        return this.getBestFiveCardHand(winner.cards, winningHand.name)
       })
       .concat(
         losers.map((loser) => {
-          return {
-            id: loser.id,
-            cards: this.getBestFiveCardHand(loser.cards, winningHand.name)
-          }
+          return this.getBestFiveCardHand(loser.cards, winningHand.name)
         })
       )
 
