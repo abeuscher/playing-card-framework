@@ -95,7 +95,7 @@ export interface GameState {
 }
 
 
-type Outcome = {
+export type Outcome = {
   winners: Array<CardStack>;
   losers: Array<CardStack>;
   handName: string;
