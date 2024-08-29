@@ -419,4 +419,46 @@ describe('PokerHandEvaluator.evaluateWinner', () => {
     expect(result.hands[1].cards.map(card => card.rank)).toContain(Rank.King);
     expect(result.hands[1].cards.map(card => card.rank)).toContain(Rank.Queen);
   });
+
+  
+  describe('Straight detection', () => {
+    const createHand = (ranks: Rank[], suit: Suit = Suit.Hearts): Card[] => {
+      return ranks.map(rank => createCard(rank, suit));
+    };
+
+    test('correctly identifies valid straights', () => {
+      const validStraights = [
+        createHand([Rank.Ace, Rank.King, Rank.Queen, Rank.Jack, Rank.Ten]),
+        createHand([Rank.Seven, Rank.Six, Rank.Five, Rank.Four, Rank.Three]),
+        createHand([Rank.Five, Rank.Four, Rank.Three, Rank.Two, Rank.Ace]),
+      ];
+
+      validStraights.forEach(hand => {
+        expect(PokerHandEvaluator['isStraight'](hand)).toBe(true);
+      });
+    });
+
+    test('correctly identifies invalid straights', () => {
+      const invalidStraights = [
+        createHand([Rank.King, Rank.Ace, Rank.Two, Rank.Three, Rank.Four]),
+        createHand([Rank.Queen, Rank.Jack, Rank.Ten, Rank.Nine, Rank.Seven]),
+        createHand([Rank.Ace, Rank.King, Rank.Queen, Rank.Jack, Rank.Nine]),
+        createHand([Rank.Six, Rank.Five, Rank.Four, Rank.Three, Rank.Ace]),
+      ];
+
+      invalidStraights.forEach(hand => {
+        expect(PokerHandEvaluator['isStraight'](hand)).toBe(false);
+      });
+    });
+
+    test('correctly handles Ace in straights', () => {
+      const aceHighStraight = createHand([Rank.Ace, Rank.King, Rank.Queen, Rank.Jack, Rank.Ten]);
+      const aceLowStraight = createHand([Rank.Five, Rank.Four, Rank.Three, Rank.Two, Rank.Ace]);
+      const notAStraight = createHand([Rank.King, Rank.Ace, Rank.Two, Rank.Three, Rank.Four]);
+
+      expect(PokerHandEvaluator['isStraight'](aceHighStraight)).toBe(true);
+      expect(PokerHandEvaluator['isStraight'](aceLowStraight)).toBe(true);
+      expect(PokerHandEvaluator['isStraight'](notAStraight)).toBe(false);
+    });
+  });
 })

@@ -36,32 +36,38 @@ export default class PokerHandEvaluator {
    * @returns True if the hand contains a straight, false otherwise.
    */
   private static isStraight(cards: Card[]): boolean {
-    const ranks = cards.map((card) => Object.values(Rank).indexOf(card.rank)).sort((a, b) => a - b)
-
-    // Remove duplicates manually
-    const uniqueRanks: number[] = []
-    for (const rank of ranks) {
-      if (uniqueRanks.length === 0 || rank !== uniqueRanks[uniqueRanks.length - 1]) {
-        uniqueRanks.push(rank)
+    const rankValues = {
+      [Rank.Two]: 2, [Rank.Three]: 3, [Rank.Four]: 4, [Rank.Five]: 5, [Rank.Six]: 6,
+      [Rank.Seven]: 7, [Rank.Eight]: 8, [Rank.Nine]: 9, [Rank.Ten]: 10,
+      [Rank.Jack]: 11, [Rank.Queen]: 12, [Rank.King]: 13, [Rank.Ace]: 14
+    };
+  
+    const sortedRanks = cards
+      .map(card => rankValues[card.rank])
+      .sort((a, b) => a - b);
+  
+    const uniqueRanks = Array.from(new Set(sortedRanks));
+  
+    // Check for regular straight
+    if (uniqueRanks.length >= 5) {
+      for (let i = 0; i <= uniqueRanks.length - 5; i++) {
+        if (uniqueRanks[i + 4] - uniqueRanks[i] === 4) {
+          return true;
+        }
       }
     }
-
-    // Check for Ace-low straight
-    if (uniqueRanks.includes(12)) {
-      // 12 is Ace
-      uniqueRanks.unshift(-1) // Add a low Ace at the beginning
-    }
-
-    for (let i = 0; i <= uniqueRanks.length - 5; i++) {
-      const subset = uniqueRanks.slice(i, i + 5)
-      if (subset.every((rank, index) => index === 0 || rank === subset[index - 1] + 1)) {
-        return true
+  
+    // Check for Ace-low straight (A, 2, 3, 4, 5)
+    if (uniqueRanks.includes(14)) { // 14 is Ace
+      const aceLowStraight = [14, 2, 3, 4, 5];
+      if (aceLowStraight.every(value => uniqueRanks.includes(value))) {
+        return true;
       }
     }
-
-    return false
+  
+    return false;
   }
-
+  
   /**
    * Checks if the hand contains a royal flush.
    * @param cards An array of Card objects.
