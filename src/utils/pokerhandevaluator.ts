@@ -392,29 +392,38 @@ export default class PokerHandEvaluator {
   }
 
   private static getBestStraight(cards: Card[]): Card[] {
-    const uniqueRanks = Array.from(new Set(cards.map((card) => card.rank))).sort((a, b) =>
-      this.compareRanks(b, a)
-    )
+    const rankValues = {
+      [Rank.Two]: 2, [Rank.Three]: 3, [Rank.Four]: 4, [Rank.Five]: 5, [Rank.Six]: 6,
+      [Rank.Seven]: 7, [Rank.Eight]: 8, [Rank.Nine]: 9, [Rank.Ten]: 10,
+      [Rank.Jack]: 11, [Rank.Queen]: 12, [Rank.King]: 13, [Rank.Ace]: 14
+    };
   
-    if (uniqueRanks.includes(Rank.Ace)) {
-      uniqueRanks.push(Rank.Ace)
-    }
+    const sortedCards = cards.sort((a, b) => rankValues[b.rank] - rankValues[a.rank]);
+    const uniqueRanks = Array.from(new Set(sortedCards.map(card => rankValues[card.rank])));
   
+    // Check for regular straight
     for (let i = 0; i <= uniqueRanks.length - 5; i++) {
-      const straight = uniqueRanks.slice(i, i + 5)
-      if (this.isConsecutive(straight)) {
-        const straightCards = cards.filter((card) => straight.includes(card.rank))
-          .sort((a, b) => this.compareRanks(b.rank, a.rank))
-        const result: Card[] = []
-        for (const rank of straight) {
-          const card = straightCards.find(c => c.rank === rank)
-          if (card) result.push(card)
-        }
-        
-        return result
+      if (uniqueRanks[i] - uniqueRanks[i + 4] === 4) {
+        return sortedCards.filter(card => 
+          rankValues[card.rank] <= uniqueRanks[i] && 
+          rankValues[card.rank] >= uniqueRanks[i + 4]
+        ).slice(0, 5);
       }
     }
-    return []
+  
+    // Check for Ace-low straight
+    if (uniqueRanks.includes(14) && uniqueRanks.includes(2) && uniqueRanks.includes(3) && 
+        uniqueRanks.includes(4) && uniqueRanks.includes(5)) {
+      return [
+        ...sortedCards.filter(card => card.rank === Rank.Five),
+        ...sortedCards.filter(card => card.rank === Rank.Four),
+        ...sortedCards.filter(card => card.rank === Rank.Three),
+        ...sortedCards.filter(card => card.rank === Rank.Two),
+        ...sortedCards.filter(card => card.rank === Rank.Ace)
+      ].slice(0, 5);
+    }
+  
+    return [];
   }
 
   private static getBestThreeOfAKind(cards: Card[]): Card[] {

@@ -461,4 +461,35 @@ describe('PokerHandEvaluator.evaluateWinner', () => {
       expect(PokerHandEvaluator['isStraight'](notAStraight)).toBe(false);
     });
   });
+
+  test('getBestFiveCardHand correctly handles Ace-low straight', () => {
+    const hand: Card[] = [
+      createCard(Rank.Ace, Suit.Hearts),
+      createCard(Rank.Two, Suit.Spades),
+      createCard(Rank.Three, Suit.Diamonds),
+      createCard(Rank.Four, Suit.Clubs),
+      createCard(Rank.Five, Suit.Hearts),
+      createCard(Rank.King, Suit.Spades),
+      createCard(Rank.Queen, Suit.Diamonds)
+    ];
+  
+    const result = PokerHandEvaluator['getBestFiveCardHand'](hand, 'Straight');
+  
+    expect(result.length).toBe(5);
+    expect(result.map(card => card.rank)).toEqual(
+      expect.arrayContaining([Rank.Ace, Rank.Two, Rank.Three, Rank.Four, Rank.Five])
+    );
+    expect(result.map(card => card.rank)).not.toContain(Rank.King);
+    expect(result.map(card => card.rank)).not.toContain(Rank.Queen);
+  
+    // Check that the Ace is actually present in the result
+    const aceCard = result.find(card => card.rank === Rank.Ace);
+    expect(aceCard).toBeDefined();
+  
+    // Verify the order of the cards (should be 5, 4, 3, 2, A for an Ace-low straight)
+    const expectedOrder = [Rank.Five, Rank.Four, Rank.Three, Rank.Two, Rank.Ace];
+    result.forEach((card, index) => {
+      expect(card.rank).toBe(expectedOrder[index]);
+    });
+  });
 })
